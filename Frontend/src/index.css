@@ -1,3 +1,24 @@
 @tailwind base; 
 @tailwind components;
 @tailwind utilities;
+
+/* Animated gradient utility for logo background */
+@layer utilities {
+	.bg-animated-gradient {
+		background: linear-gradient(45deg, #49a6ff, #7c5cff, #2dd4bf, #4fc3ff);
+		background-size: 300% 300%;
+		-webkit-animation: gradientBG 6s ease infinite;
+						animation: gradientBG 6s ease infinite;
+	}
+}
+
+@-webkit-keyframes gradientBG {
+	0% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0% 50%; }
+}
+@keyframes gradientBG {
+	0% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0% 50%; }
+}
