@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from 'react-router-dom'
 
 export const Welcome = () => {
   return (
@@ -16,21 +17,21 @@ export const Welcome = () => {
             <div className="mt-6 w-full">
               <ul className="space-y-4">
                 <li>
-                  <button
-                    onClick={() => (window.location.href = "/register")}
-                    className="w-full py-3 px-4 bg-gradient-to-r from-sky-400 to-indigo-500 text-white rounded-xl shadow-lg hover:scale-[1.02] transition-transform"
+                  <Link
+                    to="/register"
+                    className="block text-center w-full py-3 px-4 bg-gradient-to-r from-sky-400 to-indigo-500 text-white rounded-xl shadow-lg hover:scale-[1.02] transition-transform"
                   >
                     Register
-                  </button>
+                  </Link>
                 </li>
 
                 <li>
-                  <button
-                    onClick={() => (window.location.href = "/login")}
-                    className="w-full py-3 px-4 bg-white/6 text-sky-100 border border-white/10 rounded-xl hover:bg-white/8 transition"
+                  <Link
+                    to="/login"
+                    className="block text-center w-full py-3 px-4 bg-white/6 text-sky-100 border border-white/10 rounded-xl hover:bg-white/8 transition"
                   >
                     Login
-                  </button>
+                  </Link>
                 </li>
               </ul>
             </div>
