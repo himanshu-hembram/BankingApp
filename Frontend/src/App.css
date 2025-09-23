@@ -3,9 +3,12 @@
 @tailwind utilities;
 
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  /* allow the app to be full-bleed so pages control their own layout
+     (removed max-width / padding that created the white border) */
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
   text-align: center;
 }
 
