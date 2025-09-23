@@ -3,8 +3,17 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncEngine, AsyncSession
 
 
+# Load from .env if present, otherwise fall back to the default
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 # Use asyncpg driver
-DATABASE_URL = "postgresql+asyncpg://sourav_jkt:jkt123@localhost:5432/bank_db_f2"
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql+asyncpg://sourav_jkt:jkt123@localhost:5432/bank_db_f2",
+)
 
 # Global SQLAlchemy objects
 Base = declarative_base()
