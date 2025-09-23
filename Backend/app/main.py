@@ -1,12 +1,15 @@
 # app/main.py
 from fastapi import FastAPI
 from sqlalchemy import text, inspect
-from db import engine, Base, get_db
-
-# Import models so Base.metadata is populated (ensure they use Base from app.db)
-from models import *
+from app.db import engine, Base
+from app.models import *
+from app.routes.admin import router as admin_router
 
 app = FastAPI()
+
+# Register routers
+app.include_router(admin_router)
+
 
 # Startup: create tables asynchronously
 @app.on_event("startup")
@@ -15,12 +18,14 @@ async def on_startup():
         await conn.run_sync(Base.metadata.create_all)
     print("Database tables created")
 
+
 # Health: DB connectivity
 @app.get("/health/db")
 async def db_health():
     async with engine.connect() as conn:
         await conn.execute(text("SELECT 1"))
     return {"status": "ok", "db": "connected"}
+
 
 # Health: list tables and verify expected ones
 @app.get("/health/tables")
