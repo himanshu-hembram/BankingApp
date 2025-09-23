@@ -17,7 +17,6 @@ const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Password confirmation check
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match!");
       return;
