@@ -10,13 +10,31 @@ from sqlalchemy import (
     Text,
     TIMESTAMP,
     PrimaryKeyConstraint,
+    func,
+    UniqueConstraint,
+    DateTime,
+    Float,
 )
 from sqlalchemy.orm import relationship
-from db import Base
+from app.db import Base
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 
 # ============== MASTER TABLES ==============
 
 
+class Admin(Base):
+    __tablename__ = "admin"
+    admin_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    username = Column(String(100), nullable=False, unique=True)
+    email = Column(String(255), nullable=False, unique=True)
+    password_hash = Column(String(255), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    __table_args__ = (
+        UniqueConstraint("username", name="uq_admin_username"),
+        UniqueConstraint("email", name="uq_admin_email"),
+    )
+    
 class Country(Base):
     __tablename__ = "Country"
     CountryCode = Column(Integer, primary_key=True, index=True)

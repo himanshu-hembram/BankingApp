@@ -1,5 +1,10 @@
 fastapi==0.117.1
-uvicorn==0.22.0
+uvicorn==0.23.1
 sqlalchemy==2.0.20
 asyncio==4.0.0
 asyncpg==0.30.0
+pydantic==2.11.9
+alembic==1.11.1
+passlib==1.7.4
+python-jose==3.3.0
+pydantic2==1.1.15
