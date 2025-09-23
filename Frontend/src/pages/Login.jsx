@@ -1,14 +1,38 @@
 import React, { useState } from 'react';
+import api, { setAuthToken, setUserInfo } from '../lib/api';
+import { useNavigate } from 'react-router-dom';
 
 export const Login = () => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // For now, just log values. Integrate with backend /admin/login later.
-    console.log('login', { identifier, password });
-    // TODO: call backend and store token
+    setError('');
+    setLoading(true);
+    try {
+      const res = await api.post('/admin/login', { identifier, password });
+      // Expected TokenOut: access_token, token_type, userId, userName, userEmailid
+      const token = res.data?.access_token;
+      if (token) {
+        setAuthToken(token);
+        setUserInfo({ userId: res.data.userId, userName: res.data.userName, userEmailid: res.data.userEmailid });
+        navigate('/dashboard');
+      } else {
+        setError('No token returned from server');
+      }
+    } catch (err) {
+      if (err.response) {
+        setError(err.response.data?.detail || 'Authentication failed');
+      } else if (err.request) {
+        setError('No response from server — is backend running?');
+      } else setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -25,6 +49,7 @@ export const Login = () => {
                 onChange={(event) => setIdentifier(event.target.value)}
                 className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/8 text-white focus:ring-2 focus:ring-sky-400"
                 placeholder="username or email"
+                required
               />
             </div>
 
@@ -36,11 +61,16 @@ export const Login = () => {
                 onChange={(event) => setPassword(event.target.value)}
                 className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/8 text-white focus:ring-2 focus:ring-sky-400"
                 placeholder="password"
+                required
               />
             </div>
 
+            {error && <p className="text-red-400 text-sm">{error}</p>}
+
             <div>
-              <button type="submit" className="w-full py-2 px-4 bg-gradient-to-r from-sky-400 to-indigo-500 text-white rounded-xl">Sign in</button>
+              <button type="submit" disabled={loading} className="w-full py-2 px-4 bg-gradient-to-r from-sky-400 to-indigo-500 text-white rounded-xl">
+                {loading ? 'Signing in...' : 'Sign in'}
+              </button>
             </div>
           </form>
         </div>

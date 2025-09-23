@@ -1,6 +1,12 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+const API_BASE = "http://localhost:8000";
 
 const Register = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     adminname: "",
     email: "",
@@ -9,23 +15,61 @@ const Register = () => {
   });
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Password confirmation check
+    // Client-side password confirmation check
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match!");
       return;
     }
 
-    setError(""); // clear previous errors
-    console.log("Register form submitted:", formData);
-    // TODO: Make API call here
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    try {
+      const payload = {
+        userName: formData.adminname,
+        password: formData.password,
+        userEmail: formData.email,
+      };
+
+      const res = await axios.post(`${API_BASE}/admin/register`, payload, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (res.status === 201 || res.status === 200) {
+        setSuccess("Registration successful — redirecting to login...");
+        // small delay so user can see success message
+        setTimeout(() => navigate("/login"), 900);
+      } else {
+        setError("Unexpected response from server");
+      }
+    } catch (err) {
+      // axios error handling
+      if (err.response) {
+        // Server returned a response (4xx, 5xx)
+        const status = err.response.status;
+        const detail = err.response.data?.detail || err.response.data || err.message;
+        if (status === 409) setError(detail || "Username or email already exists");
+        else if (status === 422) setError("Validation error — check your input");
+        else setError(detail || "Server error. Try again later.");
+      } else if (err.request) {
+        setError("No response from server — is the backend running?");
+      } else {
+        setError(err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,6 +88,7 @@ const Register = () => {
                 onChange={handleChange}
                 className="w-full py-3 px-4 bg-white/10 placeholder-white/70 text-white rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
                 required
+                minLength={3}
               />
 
               <input
@@ -64,6 +109,7 @@ const Register = () => {
                 onChange={handleChange}
                 className="w-full py-3 px-4 bg-white/10 placeholder-white/70 text-white rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
                 required
+                minLength={8}
               />
 
               <input
@@ -74,15 +120,20 @@ const Register = () => {
                 onChange={handleChange}
                 className="w-full py-3 px-4 bg-white/10 placeholder-white/70 text-white rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
                 required
+                minLength={8}
               />
 
               {error && <p className="text-red-400 text-sm">{error}</p>}
+              {success && <p className="text-emerald-300 text-sm">{success}</p>}
 
               <button
                 type="submit"
-                className="w-full py-3 px-4 bg-gradient-to-r from-sky-400 to-indigo-500 text-white rounded-xl shadow-lg hover:scale-[1.02] transition-transform"
+                disabled={loading}
+                className={`w-full py-3 px-4 text-white rounded-xl shadow-lg transition-transform ${
+                  loading ? "bg-slate-500/60" : "bg-gradient-to-r from-sky-400 to-indigo-500 hover:scale-[1.02]"
+                }`}
               >
-                Register
+                {loading ? "Registering..." : "Register"}
               </button>
             </form>
 
@@ -90,7 +141,7 @@ const Register = () => {
               Already have an account?{" "}
               <span
                 className="text-sky-300 cursor-pointer hover:underline"
-                onClick={() => (window.location.href = "/login")}
+                onClick={() => navigate("/login")}
               >
                 Login
               </span>
