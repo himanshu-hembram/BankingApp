@@ -50,3 +50,56 @@ class CustomerOut(BaseModel):
     LastName: str
     EmailID: EmailStr
     model_config = {"from_attributes": True}
+
+
+class CountryOut(BaseModel):
+    CountryCode: int
+    CountryName: str
+
+    class Config:
+        from_attributes = True  # pydantic v2
+        orm_mode = True  # safe for v1 compat
+
+class StateOut(BaseModel):
+    StateCode: int
+    StateName: str
+    country: CountryOut | None = None
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
+
+class CityOut(BaseModel):
+    CityCode: int
+    CityName: str
+    state: StateOut | None = None
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
+
+class PostalCodeOut(BaseModel):
+    ZIPCode: str
+    city: CityOut | None = None
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
+
+class CustomerOutByID(BaseModel):
+    CustID: int
+    FirstName: str
+    LastName: str
+    Address1: str | None = None
+    Address2: str | None = None
+    EmailID: str
+    Phone: str | None = None
+    Mobile: str | None = None
+    DOB: date | None = None
+    MaritalStatus: str | None = None
+    ZIPCode: str | None = None
+    zipcode: PostalCodeOut | None = None  # nested
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
