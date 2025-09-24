@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_db
-from app.schemas.customer import CustomerCreate, CustomerOut, CustomerUpdate, CustomerUpdateResponse
+from app.schemas.customer import CustomerCreate, CustomerOut, CustomerUpdate, CustomerUpdateResponse, CustomerOutByID
+from app.crud.customer import get_customer_full_by_id
 from app.crud.customer import create_customer, get_customer_by_email
 from app.crud.customer import get_customer_by_id, update_customer
 from app.security.deps import get_current_admin
@@ -93,3 +94,14 @@ async def update_customer_route(cust_id: int, payload_raw: dict = Body(...), db:
         updated_columns=updated_columns,
         customer=CustomerOut.from_orm(updated_cust),
     )
+
+
+@router.get("/{cust_id}", response_model=CustomerOutByID, status_code=status.HTTP_200_OK)
+async def get_customer(cust_id: int, db: AsyncSession = Depends(get_db), admin=Depends(get_current_admin)):
+    """
+    Get full customer details including ZIPCode → City → State → Country.
+    """
+    cust = await get_customer_full_by_id(db, cust_id)
+    if not cust:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found")
+    return CustomerOutByID.model_validate(cust)

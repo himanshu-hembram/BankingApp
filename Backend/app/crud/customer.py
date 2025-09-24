@@ -1,7 +1,7 @@
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import CustomerDetail, PostalCode, City, State, Country
-
+from sqlalchemy.orm import joinedload
 
 async def get_customer_by_id(db: AsyncSession, cust_id: int) -> CustomerDetail | None:
     res = await db.execute(select(CustomerDetail).where(CustomerDetail.CustID == cust_id))
@@ -165,3 +165,18 @@ async def update_customer(db: AsyncSession, cust: CustomerDetail, payload: dict)
     await db.commit()
     await db.refresh(cust)
     return cust, updated_columns
+
+
+async def get_customer_full_by_id(db, cust_id: int):
+    stmt = (
+        select(CustomerDetail)
+        .options(
+            joinedload(CustomerDetail.zipcode)
+            .joinedload(PostalCode.city)
+            .joinedload(City.state)
+            .joinedload(State.country)
+        )
+        .where(CustomerDetail.CustID == cust_id)
+    )
+    result = await db.execute(stmt)
+    return result.scalar_one_or_none()
