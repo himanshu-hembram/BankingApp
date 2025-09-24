@@ -18,9 +18,20 @@ export const Login = () => {
       // Expected TokenOut: access_token, token_type, userId, userName, userEmailid
       const token = res.data?.access_token;
       if (token) {
+        localStorage.setItem('authToken', token);
+
+        // Store user info if needed
+        localStorage.setItem(
+          'userInfo',
+          JSON.stringify({
+            userId: res.data.userId,
+            userName: res.data.userName,
+            userEmailid: res.data.userEmailid,
+          })
+        );
         setAuthToken(token);
         setUserInfo({ userId: res.data.userId, userName: res.data.userName, userEmailid: res.data.userEmailid });
-        navigate('/dashboard');
+        navigate('/customer');
       } else {
         setError('No token returned from server');
       }

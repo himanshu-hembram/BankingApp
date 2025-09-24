@@ -60,18 +60,18 @@ const FormSelect = ({ id, label, children, value, onChange, required = false }) 
 const AddUpdateCustomer = ({ onSave, onClose, initialData = null }) => {
   const [formData, setFormData] = useState({
     id:'',
-    firstName: '',
-    lastName: '',
-    dob: '',
-    maritalStatus: 'Single',
-    email: '',
-    phone: '',
-    address1: '',
-    address2: '',
-    postalCode: '',
-    city: '',
-    state: '',
-    country: '',
+    FirstName: '',
+    LastName: '',
+    DOB: '',
+    MaritalStatus: 'Single',
+    Email: '',
+    Phone: '',
+    Address1: '',
+    Address2: '',
+    ZIPCode: '',
+    CityName: '',
+    StateName: '',
+    CountryName: '',
   });
 
   // Corrected useEffect: Only populates form if initialData is provided.
@@ -79,18 +79,18 @@ const AddUpdateCustomer = ({ onSave, onClose, initialData = null }) => {
     if (initialData) {
       setFormData({
         id: initialData.id || '',
-        firstName: initialData.first_name || '',
-        lastName: initialData.last_name || '',
-        dob: initialData.dob || '',
-        maritalStatus: initialData.marital_status || 'Single',
-        email: initialData.email || '',
-        phone: initialData.phone || '',
-        address1: initialData.address_line1 || '',
-        address2: initialData.address_line2 || '',
-        postalCode: initialData.postal_code || '',
-        city: initialData.city || '',
-        state: initialData.state || '',
-        country: initialData.country || '',
+        FirstName: initialData.FirstName || '',
+        LastName: initialData.LastName || '',
+        DOB: initialData.DOB || '',
+        MaritalStatus: initialData.MaritalStatus || 'Single',
+        Email: initialData.Email || '',
+        Phone: initialData.Phone || '',
+        Address1: initialData.Address1 || '',
+        Address2: initialData.Address2 || '',
+        ZIPCode: initialData.ZIPCode || '',
+        CityName: initialData.zipcode.city.CityName || '',
+        StateName: initialData.zipcode.city.state.StateName || '',
+        CountryName: initialData.zipcode.city.state.country.CountryName || '',
       });
     }
   }, [initialData]);
@@ -145,17 +145,17 @@ const AddUpdateCustomer = ({ onSave, onClose, initialData = null }) => {
         <fieldset className="border-t border-blue-200 pt-6">
           <legend className="text-lg font-semibold text-blue-700 px-2">Personal Details</legend>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-            <FormInput id="firstName" label="First Name" value={formData.firstName} onChange={handleChange} required />
-            <FormInput id="lastName" label="Last Name" value={formData.lastName} onChange={handleChange} required />
-            <FormInput id="dob" label="Date of Birth" type="date" value={formData.dob} onChange={handleChange} required />
-            <FormSelect id="maritalStatus" label="Marital Status" value={formData.maritalStatus} onChange={handleChange} required>
+            <FormInput id="FirstName" label="First Name" value={formData.FirstName} onChange={handleChange} required />
+            <FormInput id="LastName" label="Last Name" value={formData.LastName} onChange={handleChange} required />
+            <FormInput id="DOB" label="Date of Birth" type="date" value={formData.DOB} onChange={handleChange} required />
+            <FormSelect id="MaritalStatus" label="Marital Status" value={formData.MaritalStatus} onChange={handleChange} required>
               <option>Single</option>
               <option>Married</option>
               <option>Divorced</option>
               <option>Single Parent</option>
             </FormSelect>
-            <FormInput id="email" label="Email" type="email" value={formData.email} onChange={handleChange} required />
-            <FormInput id="phone" label="Phone" type="tel" value={formData.phone} onChange={handleChange} required />
+            <FormInput id="Email" label="Email" type="email" value={formData.Email} onChange={handleChange} required />
+            <FormInput id="Phone" label="Phone" type="tel" value={formData.Phone} onChange={handleChange} required />
           </div>
         </fieldset>
 
@@ -163,13 +163,13 @@ const AddUpdateCustomer = ({ onSave, onClose, initialData = null }) => {
         <fieldset className="border-t border-blue-200 pt-6 mt-8">
           <legend className="text-lg font-semibold text-blue-700 px-2">Address</legend>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-            <FormInput id="address1" label="Address Line 1" value={formData.address1} onChange={handleChange} required />
-            <FormInput id="address2" label="Address Line 2" value={formData.address2} onChange={handleChange} />
-            <FormInput id='city' label='City' value={formData.city} onChange={handleChange} />
-            <FormInput id='state' label='State' value={formData.state} onChange={handleChange} />
-            <FormInput id='country' label='Country' value={formData.country} onChange={handleChange} />
-            <FormInput id='postalCode' label='Postal Code' value={formData.postalCode} onChange={handlePostalChange} />
-      
+            <FormInput id="Address1" label="Address Line 1" value={formData.Address1} onChange={handleChange} required />
+            <FormInput id="Address2" label="Address Line 2" value={formData.Address2} onChange={handleChange} />
+            <FormInput id='CityName' label='City' value={formData.CityName} onChange={handleChange} />
+            <FormInput id='StateName' label='State' value={formData.StateName} onChange={handleChange} />
+            <FormInput id='CountryName' label='Country' value={formData.CountryName} onChange={handleChange} />
+            <FormInput id='ZIPCode' label='Postal Code' value={formData.ZIPCode} onChange={handlePostalChange} />
+
           </div>
         </fieldset>
 
