@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
-import AddUpdateCustomer from './AddUpdateCustomer';
-import CustomerDisplayForm from './CustomerDisplayForm';
+import AddUpdateCustomer from '../components/AddUpdateCustomer';
+import CustomerDisplayForm from '../components/CustomerDisplayForm';
 import CustomerContext from '../context/CustomerContext'; // Import the context
 
 export default function CustomerPage() {
@@ -98,6 +98,7 @@ export default function CustomerPage() {
           onSave={saveCustomer}
           onClose={closeDialog}
           initialData={currentCustomer}
+          searchId={searchId}
         />
       </div>
     </div>
