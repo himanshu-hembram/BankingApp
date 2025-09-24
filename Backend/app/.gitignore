@@ -1,6 +1,7 @@
 # .gitignore for the Python backend (Backend/app)
 
 # Virtual environments
+.venv312/
 .venv/
 venv/
 env/
