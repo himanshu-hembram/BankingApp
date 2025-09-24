@@ -8,7 +8,6 @@ from app.security.jwt import SECRET_KEY, ALGORITHM
 
 bearer_scheme = HTTPBearer()
 
-
 async def get_current_admin(
     creds: HTTPAuthorizationCredentials = Depends(bearer_scheme), db: AsyncSession = Depends(get_db)
 ):
