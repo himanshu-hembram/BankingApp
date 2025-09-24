@@ -25,7 +25,6 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Client-side password confirmation check
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match!");
       return;
