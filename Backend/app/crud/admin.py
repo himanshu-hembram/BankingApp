@@ -16,3 +16,17 @@ async def create_admin(db: AsyncSession, username: str, email: str, password_has
     await db.commit()
     await db.refresh(admin)
     return admin
+
+
+async def get_admin_by_id(db: AsyncSession, admin_id: str) -> Admin | None:
+    """Fetch an admin by UUID (admin_id). Accepts string UUID or UUID object."""
+    from uuid import UUID
+
+    try:
+        uid = UUID(admin_id)
+    except Exception:
+        # If conversion fails, try to query directly (the query will simply return None)
+        uid = admin_id
+
+    res = await db.execute(select(Admin).where(Admin.admin_id == uid))
+    return res.scalars().first()
