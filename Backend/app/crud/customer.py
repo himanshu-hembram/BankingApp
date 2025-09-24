@@ -3,6 +3,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import CustomerDetail, PostalCode, City, State, Country
 
 
+async def get_customer_by_id(db: AsyncSession, cust_id: int) -> CustomerDetail | None:
+    res = await db.execute(select(CustomerDetail).where(CustomerDetail.CustID == cust_id))
+    return res.scalars().first()
+
+
 async def get_customer_by_email(db: AsyncSession, email: str) -> CustomerDetail | None:
     res = await db.execute(select(CustomerDetail).where(CustomerDetail.EmailID == email))
     return res.scalars().first()
@@ -80,3 +85,83 @@ async def create_customer(db: AsyncSession, *, payload: dict) -> CustomerDetail:
     await db.commit()
     await db.refresh(cust)
     return cust
+
+
+async def update_customer(db: AsyncSession, cust: CustomerDetail, payload: dict) -> tuple[CustomerDetail, list[str]]:
+    """Update an existing customer in-place. payload contains keys like in create_customer.
+
+    Only keys present in payload (not None) will be considered for update. Handles ZIPCode changes
+    and will create postal/city/state/country if needed (same rules as create_customer).
+    """
+    # Track which columns were changed
+    updated_columns: list[str] = []
+
+    # Track whether we need to change ZIP/postal
+    new_zip = payload.get('ZIPCode')
+    if new_zip and new_zip != cust.ZIPCode:
+        # find existing postal
+        res = await db.execute(select(PostalCode).where(PostalCode.ZIPCode == new_zip))
+        postal = res.scalars().first()
+        if not postal:
+            # create hierarchy
+            city_name = payload.get('CityName')
+            state_name = payload.get('StateName')
+            country_name = payload.get('CountryName')
+            if not (new_zip and city_name and state_name and country_name):
+                raise ValueError(
+                    "ZIP code not found. To create a new postal record, provide ZIPCode, CityName, StateName and CountryName in the payload."
+                )
+
+            # Country
+            q = select(Country).where(func.lower(Country.CountryName) == country_name.lower())
+            res = await db.execute(q)
+            country = res.scalars().first()
+            if not country:
+                country = Country(CountryName=country_name)
+                db.add(country)
+                await db.flush()
+
+            # State
+            q = select(State).where(
+                func.lower(State.StateName) == state_name.lower(), State.CountryCode == country.CountryCode
+            )
+            res = await db.execute(q)
+            state = res.scalars().first()
+            if not state:
+                state = State(StateName=state_name, CountryCode=country.CountryCode)
+                db.add(state)
+                await db.flush()
+
+            # City
+            q = select(City).where(func.lower(City.CityName) == city_name.lower(), City.StateCode == state.StateCode)
+            res = await db.execute(q)
+            city = res.scalars().first()
+            if not city:
+                city = City(CityName=city_name, StateCode=state.StateCode)
+                db.add(city)
+                await db.flush()
+
+            postal = PostalCode(ZIPCode=new_zip, CityCode=city.CityCode)
+            db.add(postal)
+            await db.flush()
+
+        # assign new postal ZIP
+        cust.ZIPCode = postal.ZIPCode
+        updated_columns.append('ZIPCode')
+
+    # Update other fields if provided and different
+    updatable = [
+        'FirstName','LastName','Address1','Address2','EmailID','Phone','Mobile','DOB','MaritalStatus'
+    ]
+    for key in updatable:
+        if key in payload and payload.get(key) is not None:
+            new_val = payload.get(key)
+            old_val = getattr(cust, key)
+            # For dates, compare date objects (Pydantic should supply date)
+            if new_val != old_val:
+                setattr(cust, key, new_val)
+                updated_columns.append(key)
+
+    await db.commit()
+    await db.refresh(cust)
+    return cust, updated_columns
