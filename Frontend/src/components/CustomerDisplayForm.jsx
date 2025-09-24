@@ -32,7 +32,7 @@ const CustomerDisplayForm = ({ customer }) => {
       <FormInput label="Last Name" value={customer.LastName} />
       <FormInput label="Date of Birth" value={customer.DOB} />
       <FormInput label="Marital Status" value={customer.MaritalStatus} />
-      <FormInput label="Email" value={customer.Email} />
+      <FormInput label="EmailID" value={customer.EmailID} />
       <FormInput label="Phone" value={customer.Phone } />
     </div>
   </fieldset>

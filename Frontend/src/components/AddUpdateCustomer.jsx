@@ -64,7 +64,7 @@ const AddUpdateCustomer = ({ onSave, onClose, initialData = null }) => {
     LastName: '',
     DOB: '',
     MaritalStatus: 'Single',
-    Email: '',
+    EmailID: '',
     Phone: '',
     Address1: '',
     Address2: '',
@@ -78,12 +78,12 @@ const AddUpdateCustomer = ({ onSave, onClose, initialData = null }) => {
   useEffect(() => {
     if (initialData) {
       setFormData({
-        id: initialData.id || '',
+        id: initialData.CustID || '',
         FirstName: initialData.FirstName || '',
         LastName: initialData.LastName || '',
         DOB: initialData.DOB || '',
         MaritalStatus: initialData.MaritalStatus || 'Single',
-        Email: initialData.Email || '',
+        EmailID: initialData.EmailID || '',
         Phone: initialData.Phone || '',
         Address1: initialData.Address1 || '',
         Address2: initialData.Address2 || '',
@@ -101,25 +101,27 @@ const AddUpdateCustomer = ({ onSave, onClose, initialData = null }) => {
   };
 
   const handlePostalChange = async (e) => {
-    const code = e.target.value;
-    setFormData(prev => ({ ...prev, postalCode: code }));
+  const code = e.target.value;
+  setFormData(prev => ({ ...prev, ZIPCode: code }));
 
-    if (code.length >= 5) {
-      try {  
-        const res = await fetch(`https://api.zippopotam.us/in/${code}`);
-        if (!res.ok) return;
-        const data = await res.json();
-        setFormData(prev => ({
-          ...prev,
-          city: data.places[0]["place name"],
-          state: data.places[0]["state"],
-          country: data.country,
-        }));
-      } catch (err) {
-        console.error("Error fetching location:", err);
-      }
+  // ✅ Call API only when ZIP has exactly 6 digits
+  if (code.length === 6) {
+    try {  
+      const res = await fetch(`https://api.zippopotam.us/in/${code}`);
+      if (!res.ok) return;
+
+      const data = await res.json();
+      setFormData(prev => ({
+        ...prev,
+        CityName: data.places[0]["place name"],
+        StateName: data.places[0]["state"],
+        CountryName: data.country,
+      }));
+    } catch (err) {
+      console.error("Error fetching location:", err);
     }
-  };
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -154,7 +156,7 @@ const AddUpdateCustomer = ({ onSave, onClose, initialData = null }) => {
               <option>Divorced</option>
               <option>Single Parent</option>
             </FormSelect>
-            <FormInput id="Email" label="Email" type="email" value={formData.Email} onChange={handleChange} required />
+            <FormInput id="EmailID" label="EmailID" type="email" value={formData.EmailID} onChange={handleChange} required />
             <FormInput id="Phone" label="Phone" type="tel" value={formData.Phone} onChange={handleChange} required />
           </div>
         </fieldset>

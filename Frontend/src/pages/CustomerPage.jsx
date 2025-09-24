@@ -98,6 +98,7 @@ export default function CustomerPage() {
           onSave={saveCustomer}
           onClose={closeDialog}
           initialData={currentCustomer}
+          searchId={searchId}
         />
       </div>
     </div>
