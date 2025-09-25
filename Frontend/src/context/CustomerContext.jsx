@@ -161,7 +161,7 @@ export const CustomerProvider = ({ children }) => {
           throw new Error("No auth token found — please login again.");
 
         const response = await fetch(
-          `${API_BASE}/${encodeURIComponent(searchedCustomer.id)}`,
+          `${API_BASE}/${encodeURIComponent(searchedCustomer.CustID)}`,
           {
             method: "DELETE",
             headers: {
