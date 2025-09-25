@@ -1,6 +1,6 @@
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models import CustomerDetail, PostalCode, City, State, Country
+from app.models import CustomerDetail, PostalCode, City, State, Country, CustomerAccounts, SavingAccountDetail, LoanAccountDetail
 from sqlalchemy.orm import joinedload
 
 async def get_customer_by_id(db: AsyncSession, cust_id: int) -> CustomerDetail | None:
@@ -167,19 +167,26 @@ async def update_customer(db: AsyncSession, cust: CustomerDetail, payload: dict)
     return cust, updated_columns
 
 
-async def get_customer_full_by_id(db, cust_id: int):
-    stmt = (
+async def get_customer_full_by_id(db: AsyncSession, cust_id: int):
+    result = await db.execute(
         select(CustomerDetail)
         .options(
             joinedload(CustomerDetail.zipcode)
-            .joinedload(PostalCode.city)
-            .joinedload(City.state)
-            .joinedload(State.country)
+                .joinedload(PostalCode.city)
+                .joinedload(City.state)
+                .joinedload(State.country),
+            joinedload(CustomerDetail.accounts)
+                .joinedload(CustomerAccounts.account_type),
+            joinedload(CustomerDetail.accounts)
+                .joinedload(CustomerAccounts.saving_detail)
+                .joinedload(SavingAccountDetail.transactions),
+            joinedload(CustomerDetail.accounts)
+                .joinedload(CustomerAccounts.loan_detail)
+                .joinedload(LoanAccountDetail.emis),
         )
         .where(CustomerDetail.CustID == cust_id)
     )
-    result = await db.execute(stmt)
-    return result.scalar_one_or_none()
+    return result.unique().scalar_one_or_none()
 
 async def delete_customer(db: AsyncSession, cust_id: int = None, email: str = None):
     """

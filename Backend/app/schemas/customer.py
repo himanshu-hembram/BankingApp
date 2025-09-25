@@ -1,6 +1,7 @@
-from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
+from pydantic import BaseModel, EmailStr, Field, condecimal
+from typing import Annotated, Optional
 from datetime import date
+from decimal import Decimal
 
 
 
@@ -88,6 +89,42 @@ class PostalCodeOut(BaseModel):
         from_attributes = True
         orm_mode = True
 
+class SavingTxnOut(BaseModel):
+    TxnID: int
+    TxnType: str
+    TxnDate: date
+    TxnAmount: float
+    Balance: float
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
+
+
+class LoanEMIOut(BaseModel):
+    EMIID: int
+    EMIAmount: float
+    DueDate: date
+    PaidDate: date | None = None
+    Status: str
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
+
+
+class AccountOut(BaseModel):
+    AcctNum: int
+    AccountType: str
+    Balance: float | None = None
+    transactions: list[SavingTxnOut] = []   # for savings
+    emis: list[LoanEMIOut] = []             # for loans
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
+
+
 class CustomerOutByID(BaseModel):
     CustID: int
     FirstName: str
@@ -100,7 +137,8 @@ class CustomerOutByID(BaseModel):
     DOB: date | None = None
     MaritalStatus: str | None = None
     ZIPCode: str | None = None
-    zipcode: PostalCodeOut | None = None  # nested
+    zipcode: PostalCodeOut | None = None
+    accounts: list[AccountOut] = []
 
     class Config:
         from_attributes = True
@@ -108,15 +146,3 @@ class CustomerOutByID(BaseModel):
 
 
 
-class AdvSearchRequest(BaseModel):
-    firstName: Optional[str] = None
-    lastName: Optional[str] = None
-    email: Optional[str] = None
-    mobile: Optional[str] = None
-
-class AdvSearchResponseItem(BaseModel):
-    custId: int
-    firstName: str
-    lastName: str
-    phone: Optional[str]
-    email: Optional[str]

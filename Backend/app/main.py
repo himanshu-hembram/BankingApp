@@ -6,6 +6,7 @@ from app.db import engine, Base
 from app.models import *
 from app.routes.admin import router as admin_router
 from app.routes.customers import router as customers_router
+from app.routes.account import router as account_router
 
 app = FastAPI()
 
@@ -29,6 +30,7 @@ app.add_middleware(
 # Register routers
 app.include_router(admin_router)
 app.include_router(customers_router)
+app.include_router(account_router)
 
 
 # Startup: create tables asynchronously
