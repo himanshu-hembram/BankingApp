@@ -1,6 +1,7 @@
-from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
+from pydantic import BaseModel, EmailStr, Field, condecimal
+from typing import Annotated, Optional
 from datetime import date
+from decimal import Decimal
 
 
 class CustomerCreate(BaseModel):
@@ -86,6 +87,42 @@ class PostalCodeOut(BaseModel):
         from_attributes = True
         orm_mode = True
 
+class SavingTxnOut(BaseModel):
+    TxnID: int
+    TxnType: str
+    TxnDate: date
+    TxnAmount: float
+    Balance: float
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
+
+
+class LoanEMIOut(BaseModel):
+    EMIID: int
+    EMIAmount: float
+    DueDate: date
+    PaidDate: date | None = None
+    Status: str
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
+
+
+class AccountOut(BaseModel):
+    AcctNum: int
+    AccountType: str
+    Balance: float | None = None
+    transactions: list[SavingTxnOut] = []   # for savings
+    emis: list[LoanEMIOut] = []             # for loans
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
+
+
 class CustomerOutByID(BaseModel):
     CustID: int
     FirstName: str
@@ -98,8 +135,38 @@ class CustomerOutByID(BaseModel):
     DOB: date | None = None
     MaritalStatus: str | None = None
     ZIPCode: str | None = None
-    zipcode: PostalCodeOut | None = None  # nested
+    zipcode: PostalCodeOut | None = None
+    accounts: list[AccountOut] = []
 
     class Config:
         from_attributes = True
         orm_mode = True
+
+
+
+
+
+# reusable constrained decimal types
+Decimal18_2 = Annotated[Decimal, condecimal(max_digits=18, decimal_places=2)]
+Decimal5_2 = Annotated[Decimal, condecimal(max_digits=5, decimal_places=2)]
+
+
+class SavingAccountCreate(BaseModel):
+    AccountType: str                  # e.g. "Savings"
+    AccSubType: Optional[str] = None
+    Balance: Decimal18_2 = Decimal("0.00")
+    TransferLimit: Decimal18_2
+    BranchCode: str
+
+
+class LoanAccountCreate(BaseModel):
+    AccountType: str                  # e.g. "Loan"
+    AccSubType: Optional[str] = None
+    EMIID: int
+    BalanceAmount: Decimal18_2
+    BranchCode: str
+    RateOfInterest: Decimal5_2
+    LoanDuration: int                 # months
+    TotalLoanAmount: Decimal18_2
+
+
