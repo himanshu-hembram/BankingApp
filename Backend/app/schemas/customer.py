@@ -4,6 +4,8 @@ from datetime import date
 from decimal import Decimal
 
 
+
+
 class CustomerCreate(BaseModel):
     FirstName: str = Field(..., min_length=1)
     LastName: str = Field(..., min_length=1)
@@ -142,31 +144,5 @@ class CustomerOutByID(BaseModel):
         from_attributes = True
         orm_mode = True
 
-
-
-
-
-# reusable constrained decimal types
-Decimal18_2 = Annotated[Decimal, condecimal(max_digits=18, decimal_places=2)]
-Decimal5_2 = Annotated[Decimal, condecimal(max_digits=5, decimal_places=2)]
-
-
-class SavingAccountCreate(BaseModel):
-    AccountType: str                  # e.g. "Savings"
-    AccSubType: Optional[str] = None
-    Balance: Decimal18_2 = Decimal("0.00")
-    TransferLimit: Decimal18_2
-    BranchCode: str
-
-
-class LoanAccountCreate(BaseModel):
-    AccountType: str                  # e.g. "Loan"
-    AccSubType: Optional[str] = None
-    EMIID: int
-    BalanceAmount: Decimal18_2
-    BranchCode: str
-    RateOfInterest: Decimal5_2
-    LoanDuration: int                 # months
-    TotalLoanAmount: Decimal18_2
 
 

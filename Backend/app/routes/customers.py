@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Body
+from fastapi import APIRouter, Depends, HTTPException, status, Body, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_db
 from app.schemas.customer import CustomerCreate, CustomerOut, CustomerUpdate, CustomerUpdateResponse, CustomerOutByID, AccountOut, PostalCodeOut, SavingTxnOut, LoanEMIOut
@@ -7,6 +7,10 @@ from app.crud.customer import create_customer, get_customer_by_email
 from app.crud.customer import get_customer_by_id, update_customer
 from app.security.deps import get_current_admin
 from app.crud.customer import delete_customer
+import sqlalchemy as sa
+
+from app.models import CustomerDetail
+from app.schemas.customer import AdvSearchRequest, AdvSearchResponseItem
 
 
 router = APIRouter(prefix="/customers", tags=["customers"])
@@ -204,3 +208,34 @@ async def delete_customer_route(
         )
 
     return {"message": f"Customer '{identifier}' deleted successfully"}
+
+
+
+@router.post("/advSearch", response_model=list[AdvSearchResponseItem])
+async def adv_search(payload: AdvSearchRequest, session: AsyncSession = Depends(get_db)):
+    filters = []
+    if payload.firstName:
+        filters.append(sa.func.lower(CustomerDetail.FirstName).like(f"%{payload.firstName.lower()}%"))
+    if payload.lastName:
+        filters.append(sa.func.lower(CustomerDetail.LastName).like(f"%{payload.lastName.lower()}%"))
+    if payload.email:
+        filters.append(sa.func.lower(CustomerDetail.EmailID) == payload.email.lower())
+    if payload.mobile:
+        filters.append(CustomerDetail.Mobile == payload.mobile)
+
+    if not filters:
+        raise HTTPException(status_code=400, detail="At least one filter is required")
+
+    stmt = (
+        sa.select(
+            CustomerDetail.CustID.label("custId"),
+            CustomerDetail.FirstName.label("firstName"),
+            CustomerDetail.LastName.label("lastName"),
+            CustomerDetail.Phone.label("phone"),
+            CustomerDetail.EmailID.label("email"),
+        )
+        .where(sa.and_(*filters))
+        .limit(200)
+    )
+    result = await session.execute(stmt)
+    return [dict(row._mapping) for row in result]
