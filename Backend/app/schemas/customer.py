@@ -3,6 +3,8 @@ from typing import Optional
 from datetime import date
 
 
+
+
 class CustomerCreate(BaseModel):
     FirstName: str = Field(..., min_length=1)
     LastName: str = Field(..., min_length=1)
@@ -103,3 +105,18 @@ class CustomerOutByID(BaseModel):
     class Config:
         from_attributes = True
         orm_mode = True
+
+
+
+class AdvSearchRequest(BaseModel):
+    firstName: Optional[str] = None
+    lastName: Optional[str] = None
+    email: Optional[str] = None
+    mobile: Optional[str] = None
+
+class AdvSearchResponseItem(BaseModel):
+    custId: int
+    firstName: str
+    lastName: str
+    phone: Optional[str]
+    email: Optional[str]
