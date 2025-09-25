@@ -180,3 +180,25 @@ async def get_customer_full_by_id(db, cust_id: int):
     )
     result = await db.execute(stmt)
     return result.scalar_one_or_none()
+
+async def delete_customer(db: AsyncSession, cust_id: int = None, email: str = None):
+    """
+    Delete a customer by CustID or EmailID.
+    Returns True if deleted, False if not found.
+    """
+    query = None
+    if cust_id is not None:
+        query = select(CustomerDetail).where(CustomerDetail.CustID == cust_id)
+    elif email is not None:
+        query = select(CustomerDetail).where(CustomerDetail.EmailID == email)
+    else:
+        return False
+
+    result = await db.execute(query)
+    customer = result.scalar_one_or_none()
+    if not customer:
+        return False
+
+    await db.delete(customer)
+    await db.commit()
+    return True

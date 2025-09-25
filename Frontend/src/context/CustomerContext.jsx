@@ -109,7 +109,7 @@ export const CustomerProvider = ({ children }) => {
       alert(error.message);
     }
   },
-  [isUpdateMode, closeDialog,navigate]   // ✅ add isUpdateMode dependency
+  [isUpdateMode, closeDialog, navigate]   // ✅ add isUpdateMode dependency
 );
 
 
