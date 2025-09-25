@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import AddUpdateCustomer from '../components/AddUpdateCustomer';
 import CustomerDisplayForm from '../components/CustomerDisplayForm';
 import CustomerContext from '../context/CustomerContext'; // Import the context
+import CustomerAdvanceSearch from '../components/AdvanceSearch';
 
 export default function CustomerPage() {
   // Get everything from the context
@@ -14,9 +15,13 @@ export default function CustomerPage() {
     saveCustomer,
     deleteCustomer,
     searchCustomer,
+    
   } = useContext(CustomerContext);
 
   const [searchId, setSearchId] = useState('');
+  const [isAdvanceSearchOpen, setIsAdvanceSearchOpen] = useState(false);
+
+ 
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -32,6 +37,7 @@ export default function CustomerPage() {
   <div className="flex-grow max-w-6xl w-full mx-auto px-4">
     {/* Top Search Section */}
     <div className="p-4 mb-6 bg-white rounded-lg shadow-md">
+
       <form onSubmit={handleSearch} className="flex items-center gap-4">
         {/* Label + Input inline */}
         <label htmlFor="customerId" className="text-sm font-medium text-gray-700 whitespace-nowrap">
@@ -48,9 +54,14 @@ export default function CustomerPage() {
         <button type="submit" className="px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
           Search
         </button>
-        <button type="button" className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+        <button onClick={() => setIsAdvanceSearchOpen(true)} type="button" className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
           Advanced Search
         </button>
+        <CustomerAdvanceSearch
+          isOpen={isAdvanceSearchOpen}
+          onClose={() => setIsAdvanceSearchOpen(false)}
+          
+        />
       </form>
     </div>
 

@@ -26,106 +26,151 @@ export const CustomerProvider = ({ children }) => {
   }, []);
 
   const searchCustomer = useCallback(async (customerId) => {
-  if (!customerId) return;
-  console.log(`Searching for customer with ID: ${customerId}`);
+    if (!customerId) return;
+    console.log(`Searching for customer with ID: ${customerId}`);
 
-  try {
-    const token = localStorage.getItem("authToken");
-    if (!token) throw new Error("No auth token found — please login again.");
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("No auth token found — please login again.");
 
-    const response = await fetch(
-      `${API_BASE}/${encodeURIComponent(customerId.trim())}`,
-      {
+      const idStr = String(customerId).trim();
+      const response = await fetch(`${API_BASE}/${encodeURIComponent(idStr)}`, {
         method: "GET",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401)
+          throw new Error(
+            "Unauthorized — token may be expired. Please log in again."
+          );
+        else if (response.status === 404)
+          throw new Error("Customer not found.");
+        else throw new Error(`Request failed with status ${response.status}`);
       }
-    );
 
-    if (!response.ok) {
-      if (response.status === 401) throw new Error("Unauthorized — token may be expired. Please log in again.");
-      else if (response.status === 404) throw new Error("Customer not found.");
-      else throw new Error(`Request failed with status ${response.status}`);
+      const data = await response.json();
+      setSearchedCustomer(data);
+      console.log("Customer found:", data);
+
+      // ✅ Save customer ID separately
+      localStorage.setItem("selectedCustId", data.CustID);
+    } catch (error) {
+      console.error("Failed to fetch customer:", error);
+      setSearchedCustomer(null);
+      alert(error.message);
     }
+  }, []);
 
-    const data = await response.json();
-    setSearchedCustomer(data);
-    console.log("Customer found:", data);
-
-    // ✅ Save customer ID separately
-    localStorage.setItem("selectedCustId", data.CustID);
-
-  } catch (error) {
-    console.error("Failed to fetch customer:", error);
-    setSearchedCustomer(null);
-    alert(error.message);
-  }
-}, []);
-
-
-
-  const saveCustomer = useCallback(
-  async (formData) => {
-    const customerId = localStorage.getItem("selectedCustId");
-
-    const url = isUpdateMode
-      ? `${API_BASE}/${encodeURIComponent(customerId.trim())}`
-      : API_BASE;
-    const method = isUpdateMode ? "PUT" : "POST";
-
+  const advanceSearchCustomers = useCallback(async (filters) => {
     try {
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("No auth token found — please login again.");
 
-      console.log("Sending data to:", url);
-      console.log("Method:", method);
-      console.log("Payload:", JSON.stringify(formData));
-
-      const response = await fetch(url, {
-        method,
+      const response = await fetch(`${API_BASE}/advSearch`, {
+        method: "POST",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(filters),
       });
 
+      console.log(response);
       if (!response.ok) {
-        throw new Error(`Failed to save customer. Status: ${response.status}`);
+        if (response.status === 400)
+          throw new Error("At least one filter is required");
+        else throw new Error(`Request failed with status ${response.status}`);
       }
 
-      // const savedData = await response.json();
-      // console.log("Customer saved:", savedData);
-      // setSearchedCustomer(savedData);
-      alert("Customer saved successfully!");
-      closeDialog();
-      navigate("/customer"); // Redirect to /customer page after saving
+      const data = await response.json();
+      console.log("Advance search results:", data);
+      return data; // return array of customers
     } catch (error) {
-      console.error("Failed to save customer:", error);
+      console.error("Advance search failed:", error);
       alert(error.message);
+      return [];
     }
-  },
-  [isUpdateMode, closeDialog, navigate]   // ✅ add isUpdateMode dependency
-);
+  }, []);
 
+  const saveCustomer = useCallback(
+    async (formData) => {
+      const customerId = localStorage.getItem("selectedCustId");
 
+      const url = isUpdateMode
+        ? `${API_BASE}/${encodeURIComponent(customerId.trim())}`
+        : API_BASE;
+      const method = isUpdateMode ? "PUT" : "POST";
+
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token)
+          throw new Error("No auth token found — please login again.");
+
+        console.log("Sending data to:", url);
+        console.log("Method:", method);
+        console.log("Payload:", JSON.stringify(formData));
+        setSearchedCustomer(formData);
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to save customer. Status: ${response.status}`
+          );
+        }
+
+        // const savedData = await response.json();
+        // console.log("Customer saved:", savedData);
+        // setSearchedCustomer(savedData);
+        alert("Customer saved successfully!");
+        closeDialog();
+        navigate("/customer"); // Redirect to /customer page after saving
+      } catch (error) {
+        console.error("Failed to save customer:", error);
+        alert(error.message);
+      }
+    },
+    [isUpdateMode, closeDialog, navigate] // ✅ add isUpdateMode dependency
+  );
 
   const deleteCustomer = useCallback(async () => {
     if (!searchedCustomer) return;
+    console.log("Deleting customer:", searchedCustomer);
     if (
       window.confirm(
-        `Are you sure you want to delete ${searchedCustomer.firstName}?`
+        `Are you sure you want to delete ${searchedCustomer.FirstName}?`
       )
     ) {
       try {
-        const response = await fetch(`${API_BASE}/${searchedCustomer.id}`, {
-          method: "DELETE",
-        });
+        const token = localStorage.getItem("authToken");
+        if (!token)
+          throw new Error("No auth token found — please login again.");
 
+        const response = await fetch(
+          `${API_BASE}/${encodeURIComponent(searchedCustomer.id)}`,
+          {
+            method: "DELETE",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to delete customer. Status: ${response.status}`
@@ -151,6 +196,7 @@ export const CustomerProvider = ({ children }) => {
       saveCustomer,
       deleteCustomer,
       searchCustomer,
+      advanceSearchCustomers,
     }),
     [
       isDialogOpen,
@@ -161,6 +207,7 @@ export const CustomerProvider = ({ children }) => {
       saveCustomer,
       deleteCustomer,
       searchCustomer,
+      advanceSearchCustomers,
     ]
   );
 
