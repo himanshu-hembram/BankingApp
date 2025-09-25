@@ -145,4 +145,39 @@ class CustomerOutByID(BaseModel):
         orm_mode = True
 
 
+# reusable constrained decimal types
+Decimal18_2 = Annotated[Decimal, condecimal(max_digits=18, decimal_places=2)]
+Decimal5_2 = Annotated[Decimal, condecimal(max_digits=5, decimal_places=2)]
+
+
+class SavingAccountCreate(BaseModel):
+    AccountType: str                  # e.g. "Savings"
+    AccSubType: Optional[str] = None
+    Balance: Decimal18_2 = Decimal("0.00")
+    TransferLimit: Decimal18_2
+    BranchCode: str
+
+
+class LoanAccountCreate(BaseModel):
+    AccountType: str                  # e.g. "Loan"
+    AccSubType: Optional[str] = None
+    EMIID: int
+    BalanceAmount: Decimal18_2
+    BranchCode: str
+    RateOfInterest: Decimal5_2
+    LoanDuration: int                 # months
+    TotalLoanAmount: Decimal18_2
+
+class AdvSearchRequest(BaseModel):
+    firstName: Optional[str] = None
+    lastName: Optional[str] = None
+    email: Optional[str] = None
+    mobile: Optional[str] = None
+
+class AdvSearchResponseItem(BaseModel):
+    custId: int
+    firstName: str
+    lastName: str
+    phone: Optional[str]
+    email: Optional[str]
 
