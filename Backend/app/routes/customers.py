@@ -6,6 +6,8 @@ from app.crud.customer import get_customer_full_by_id
 from app.crud.customer import create_customer, get_customer_by_email
 from app.crud.customer import get_customer_by_id, update_customer
 from app.security.deps import get_current_admin
+from app.crud.customer import delete_customer
+
 
 router = APIRouter(prefix="/customers", tags=["customers"])
 
@@ -105,3 +107,31 @@ async def get_customer(cust_id: int, db: AsyncSession = Depends(get_db), admin=D
     if not cust:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found")
     return CustomerOutByID.model_validate(cust)
+
+
+@router.delete("/{identifier}", status_code=status.HTTP_200_OK)
+async def delete_customer_route(
+    identifier: str,
+    db: AsyncSession = Depends(get_db),
+    admin=Depends(get_current_admin),
+):
+    """
+    Delete a customer by CustID (int) or EmailID (string).
+    """
+    deleted = False
+
+    # Try CustID first
+    try:
+        cust_id = int(identifier)
+        deleted = await delete_customer(db, cust_id=cust_id)
+    except ValueError:
+        # Not an int → try email
+        deleted = await delete_customer(db, email=identifier)
+
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Customer not found",
+        )
+
+    return {"message": f"Customer '{identifier}' deleted successfully"}
