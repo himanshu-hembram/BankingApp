@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field, condecimal
 from typing import Annotated, Optional
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 
 
@@ -180,4 +180,23 @@ class AdvSearchResponseItem(BaseModel):
     lastName: str
     phone: Optional[str]
     email: Optional[str]
+
+class SavingDepositRequest(BaseModel):
+    AcctNum: int
+    Amount: Decimal18_2 = Field(..., gt=Decimal("0"))
+    # accept either 'YYYY-MM-DD' or ISO datetime; coerce later
+    TxnDate: str
+    TxnDetail: str | None = None
+
+    def txn_date_as_date(self) -> date:
+        # permissive parsing: date string or datetime string
+        try:
+            return date.fromisoformat(self.TxnDate)
+        except ValueError:
+            return datetime.fromisoformat(self.TxnDate).date()
+class SavingWithdrawRequest(BaseModel):
+    AcctNum: int
+    Amount: Decimal18_2 = Field(..., gt=Decimal("0"))
+    TxnDate: str
+    TxnDetail: str | None = None
 
