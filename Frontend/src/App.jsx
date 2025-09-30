@@ -20,8 +20,8 @@ function App() {
       <Suspense fallback={<LoadingCard/>}>
         <Routes>
           <Route path="/" element={<Welcome />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} /> */}
 
           {/* Wrap only this route in CustomerProvider */}
           <Route
