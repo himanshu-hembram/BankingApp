@@ -9,44 +9,51 @@ const navLinks = [
 ];
 
 function Sidebar({ isOpen, toggleSidebar }) {
-  // 1. Get the current location from React Router
   const location = useLocation();
 
   return (
     <div
-      className={`fixed inset-y-0 left-0 bg-slate-800 text-white flex flex-col z-30 transition-width duration-300 ease-in-out ${
+      className={`fixed inset-y-0 left-0 bg-slate-800 text-white flex flex-col z-30 transition-all duration-300 ease-in-out shadow-lg ${
         isOpen ? 'w-64' : 'w-20'
       }`}
     >
-      <div className="h-20 flex items-center border-b border-slate-700 px-4">
-        <button onClick={toggleSidebar} className="text-gray-300 hover:text-white focus:outline-none">
-          <Menu size={28} />
+      {/* Header Section */}
+      <div className="h-20 flex items-center border-b border-slate-700 px-4 shrink-0">
+        <button
+          onClick={toggleSidebar}
+          className="text-slate-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full p-2 transition-colors"
+        >
+          <Menu size={24} />
         </button>
-        <h1 className={`text-xl font-bold ml-4 transition-opacity duration-200 ${!isOpen && 'opacity-0'}`}>
+        <h1
+          className={`text-xl font-bold ml-3 transition-opacity duration-200 whitespace-nowrap select-none ${
+            !isOpen ? 'opacity-0' : 'opacity-100'
+          }`}
+        >
           MyBank
         </h1>
       </div>
 
-      <nav className="flex-1 px-4 py-6 space-y-2">
+      {/* Navigation Links */}
+      <nav className="flex-1 px-3 py-4 space-y-2">
         {navLinks.map((link) => {
-          // 2. Check if the current path matches the link's path
           const isActive = location.pathname === link.path;
           
           return (
             <Link
               key={link.label}
               to={link.path}
-              // 3. Apply styles conditionally based on the 'isActive' boolean
-              className={`flex items-center p-3 rounded-lg transition-colors ${
+              title={isOpen ? '' : link.label}
+              className={`flex items-center p-3 rounded-lg transition-colors duration-200 ease-in-out ${
                 isActive
-                  ? 'bg-blue-600 text-white shadow-md' // Active state style
-                  : 'text-gray-300 hover:bg-slate-700 hover:text-white' // Inactive state style
+                  ? 'bg-blue-600 text-white' // Active state
+                  : 'text-slate-300 hover:bg-slate-700 hover:text-white' // Inactive state
               } ${!isOpen && 'justify-center'}`}
-              title={link.label}
+              aria-current={isActive ? 'page' : undefined}
             >
-              <link.icon size={22} />
+              <link.icon size={20} className="shrink-0" />
               <span
-                className={`ml-4 whitespace-nowrap transition-opacity duration-200 ${
+                className={`ml-4 text-sm font-medium whitespace-nowrap transition-opacity duration-200 ${
                   !isOpen && 'opacity-0 hidden'
                 }`}
               >
