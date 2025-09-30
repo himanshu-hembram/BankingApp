@@ -69,11 +69,11 @@ function AddCustomerPage() {
 
   return (
     <div className="w-full h-full">
-      <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 w-full">
-        <h3 className="text-xl font-semibold text-gray-800 border-b pb-3 mb-6">
+      <div className="bg-white pt-3 md:pt-3 rounded-lg shadow-sm border border-gray-200 w-full">
+        <h3 className="text-xl font-semibold text-gray-800 border-b pb-5 mb-2">
           Create New Customer
         </h3>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-2">
           {/* Personal Details */}
           <fieldset>
             <legend className="text-lg font-medium text-gray-700 mb-4">
