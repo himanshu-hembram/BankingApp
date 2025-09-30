@@ -10,19 +10,20 @@ function Layout({ children }) {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-100 font-sans">
-      {/* Sidebar is now position: fixed */}
+    <div className="relative min-h-screen bg-gray-100 font-sans flex">
+      {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
-      {/* Main Content Area */}
+      {/* Main Content */}
       <div
         className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
-          isSidebarOpen ? 'pl-64' : 'pl-20'
+          isSidebarOpen ? 'ml-64' : 'ml-20'
         }`}
       >
         <Header />
         <main className="flex-1 overflow-y-auto">
-          <div className="container px-2 py-2">
+          {/* Full width content wrapper */}
+          <div className="w-full px-4 py-4 md:px-6">
             {children}
           </div>
         </main>
