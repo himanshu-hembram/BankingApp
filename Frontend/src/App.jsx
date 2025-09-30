@@ -6,6 +6,7 @@ import { CustomerProvider } from './context/CustomerContext'   // import provide
 import AuthProvider from './context/AuthProvider.jsx';
 import AddCustomerPage from './pages/AddCustomerPage.jsx'
 import Layout from './layout/Layout.jsx';
+import AddAccount from './pages/AddAccount.jsx'
 
 const Welcome = lazy(() => import('./pages/Welcome'))
 const Login = lazy(() => import('./pages/Login'))
@@ -33,6 +34,8 @@ function App() {
               </CustomerProvider>
             }
           />
+
+
         </Routes>
         
       </Suspense>

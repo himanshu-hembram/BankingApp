@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { setAuthToken, setUserInfo } from "../lib/api";
+
+import { useAuth } from "../context/useAuth.js";
 
 const API_BASE = "http://localhost:8000";
 
 export default function LoginForm({ onSuccess }) {
+  const { login } = useAuth();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,18 +22,13 @@ export default function LoginForm({ onSuccess }) {
       const token = res.data?.access_token;
 
       if (token) {
-        // Store token in localStorage
-        localStorage.setItem("authToken", token);
-        setAuthToken(token);
-
-        // Store user info
         const userInfo = {
           userId: res.data.userId,
           userName: res.data.userName,
           userEmailid: res.data.userEmailid,
         };
-        localStorage.setItem("userInfo", JSON.stringify(userInfo));
-        setUserInfo(userInfo);
+        // Update AuthContext (this will call setAuthToken and persist user info)
+        login(token, userInfo);
 
         if (onSuccess) onSuccess(); // call the callback to navigate
       } else {
@@ -91,4 +88,3 @@ export default function LoginForm({ onSuccess }) {
   );
 }
 
- 
