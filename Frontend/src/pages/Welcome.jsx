@@ -1,45 +1,71 @@
-import React from "react";
-import { Link } from 'react-router-dom'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import LoginForm from "./Login";
+import RegisterForm from "./Register";
 
-export const Welcome = () => {
+export default function Welcome() {
+  const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
+
+  // Callback for successful login
+  const handleLoginSuccess = () => {
+    navigate("/customer");
+  };
+
+  // Callback for successful registration
+  const handleRegisterSuccess = () => {
+    setIsLogin(true); // switch back to login form
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-sky-900 to-slate-800">
-      <div className="w-full max-w-lg mx-4">
-        <div className="bg-white/6 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/6">
-          <div className="flex flex-col items-center text-center">
-            <div className="w-40 h-16 rounded-xl relative flex items-center justify-center shadow-lg">
-              <div className="absolute inset-0 rounded-xl bg-animated-gradient opacity-95"></div>
-              <div className="relative z-10 text-white font-bold text-lg">Banking App</div>
-            </div>
+    <div className="relative w-[800px] min-w-[800px] min-h-[480px] h-[480px] p-5 bg-gray-100 shadow-[8px_8px_8px_#d1d9e6,-8px_-8px_8px_#f9f9f9] rounded-xl overflow-hidden translate-y-8 mx-auto">
+      
+      {/* Login */}
+      <div
+        className={`absolute bottom-0 left-0 w-1/2 h-full flex justify-center items-center p-5 bg-gray-100 transition-all duration-500 ${
+          isLogin ? "z-20" : "invisible opacity-0 absolute"
+        }`}
+      >
+        <LoginForm onSuccess={handleLoginSuccess} />
+      </div>
 
-            <h1 className="mt-6 text-4xl font-bold text-white">Welcome to the Application!</h1>
+      {/* Register */}
+      <div
+        className={`absolute top-0 left-[calc(100%-480px)] w-1/2 h-full flex justify-center items-center p-5 bg-gray-100 transition-all duration-500 ${
+          !isLogin ? "z-20" : "invisible opacity-0 absolute"
+        }`}
+      >
+        <RegisterForm onSuccess={handleRegisterSuccess} />
+      </div>
 
-            <div className="mt-6 w-full">
-              <ul className="space-y-4">
-                <li>
-                  <Link
-                    to="/register"
-                    className="block text-center w-full py-3 px-4 bg-gradient-to-r from-sky-400 to-indigo-500 text-white rounded-xl shadow-lg hover:scale-[1.02] transition-transform"
-                  >
-                    Register
-                  </Link>
-                </li>
+      {/* Switch Panel */}
+      <div
+        className={`absolute top-0 left-0 h-full w-[320px] p-4 z-30 bg-gray-100 transition-all duration-500 overflow-hidden shadow-[3px_3px_8px_#d1d9e6,-3px_-3px_8px_#f9f9f9] ${
+          isLogin ? "left-[calc(100%-320px)]" : "left-0"
+        }`}
+      >
+        {/* Decorative Circles */}
+        <div className="absolute w-[400px] h-[400px] rounded-full bg-gray-100 shadow-[inset_6px_6px_10px_#d1d9e6,inset_-6px_-6px_10px_#f9f9f9] bottom-[-60%] left-[-60%] transition-all duration-500"></div>
+        <div className="absolute w-[240px] h-[240px] rounded-full bg-gray-100 shadow-[inset_6px_6px_10px_#d1d9e6,inset_-6px_-6px_10px_#f9f9f9] top-[-30%] left-[60%] transition-all duration-500"></div>
 
-                <li>
-                  <Link
-                    to="/login"
-                    className="block text-center w-full py-3 px-4 bg-white/6 text-sky-100 border border-white/10 rounded-xl hover:bg-white/8 transition"
-                  >
-                    Login
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
+        {/* Content */}
+        <div className="absolute w-[320px] p-4 flex flex-col justify-center items-center transition-all duration-500">
+          <h2 className="text-2xl font-bold leading-relaxed text-gray-800">
+            {isLogin ? "Banking App" : "Welcome Back!"}
+          </h2>
+          <p className="text-sm text-center leading-tight mt-2">
+            {isLogin
+              ? "Enter your personal details and start your journey with us"
+              : "To keep connected with us please login with your info"}
+          </p>
+          <button
+            className="w-36 h-10 rounded-2xl mt-8 font-bold text-xs bg-blue-600 text-white shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#f9f9f9] border-none outline-none cursor-pointer hover:shadow-[5px_5px_8px_#d1d9e6,-5px_-5px_8px_#f9f9f9] hover:scale-98 active:shadow-[2px_2px_5px_#d1d9e6,-2px_-2px_5px_#f9f9f9] active:scale-97 transition-all"
+            onClick={() => setIsLogin(!isLogin)}
+          >
+            {isLogin ? "Sign Up" : "Sign In"}
+          </button>
         </div>
       </div>
     </div>
   );
-};
-
-export default Welcome;
+}
