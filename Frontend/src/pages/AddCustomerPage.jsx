@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Loader2, Save, X, CheckCircle } from 'lucide-react';
-import api from '../lib/api'; // We will use this to make the API call
+import api from '../lib/api';
 
 const POSTAL_CODE_API = 'https://api.zippopotam.us/in/';
 
 const initialFormState = {
-  firstName: '', lastName: '', address1: '', address2: '', emailId: '', phone: '',
-  mobile: '', dob: '', maritalStatus: '', postalCode: '', city: '', state: '', country: '',
+  FirstName: '', LastName: '', Address1: '', Address2: '', EmailID: '', Phone: '',
+  Mobile: '', DOB: '', MaritalStatus: '', ZIPCode: '', CityName: '', StateName: '', CountryName: '',
 };
 
 function AddCustomerPage() {
@@ -26,15 +26,24 @@ function AddCustomerPage() {
     const postalCode = e.target.value;
     handleChange(e);
     if (postalCode.length > 5) {
-      setIsPostalLoading(true); setPostalError('');
+      setIsPostalLoading(true);
+      setPostalError('');
       try {
         const response = await fetch(`${POSTAL_CODE_API}${postalCode}`);
         if (!response.ok) throw new Error('Invalid Postal Code');
         const data = await response.json();
         const location = data.places[0];
-        setFormData(prev => ({ ...prev, city: location['place name'], state: location['state'], country: data['country'] }));
-      } catch (err) { setPostalError(err.message); } 
-      finally { setIsPostalLoading(false); }
+        setFormData(prev => ({
+          ...prev,
+          CityName: location['place name'],
+          StateName: location['state'],
+          CountryName: data['country'],
+        }));
+      } catch (err) {
+        setPostalError(err.message);
+      } finally {
+        setIsPostalLoading(false);
+      }
     }
   };
 
@@ -45,17 +54,13 @@ function AddCustomerPage() {
     setSuccessMessage('');
 
     try {
-      // The API call is now made directly in this file using the 'api' instance.
-      // Replace '/api/customers' with your actual backend endpoint.
-      console.log('Submitting form data:', formData);
       await api.post('/customers', formData);
-
       setSuccessMessage('Customer has been saved successfully!');
-      setFormData(initialFormState); // Reset form on success
-
+      setFormData(initialFormState);
     } catch (err) {
-      // Check for a specific error message from the backend, otherwise show a generic one.
-      const errorMessage = err.response?.data?.detail || 'Failed to save customer. Please try again.';
+      const errorMessage =
+        err.response?.data?.detail ||
+        'Failed to save customer. Please try again.';
       setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -63,48 +68,62 @@ function AddCustomerPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="bg-white p-6 md:p-8 rounded-lg shadow-md border border-gray-200">
-        <h3 className="text-2xl font-semibold text-gray-800 border-b pb-4 mb-8">Create New Customer</h3>
-        <form onSubmit={handleSubmit} className="space-y-8">
-          
+    <div className="w-full h-full">
+      <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 w-full">
+        <h3 className="text-xl font-semibold text-gray-800 border-b pb-3 mb-6">
+          Create New Customer
+        </h3>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Personal Details */}
           <fieldset>
-            <legend className="text-lg font-semibold text-gray-700 mb-6">Personal Details</legend>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-              <FormField label="First Name" name="FirstName" value={formData.firstName} onChange={handleChange} required />
-              <FormField label="Last Name" name="LastName" value={formData.lastName} onChange={handleChange} required />
-              <FormField label="Date of Birth" name="DOB" type="date" value={formData.dob} onChange={handleChange} required />
-              <FormField label="Marital Status" name="MaritalStatus" type="select" value={formData.maritalStatus} onChange={handleChange} required>
-                <option value="">Select...</option><option value="Single">Single</option><option value="Married">Married</option><option value="Divorced">Divorced</option>
+            <legend className="text-lg font-medium text-gray-700 mb-4">
+              Personal Details
+            </legend>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField label="First Name" name="FirstName" value={formData.FirstName} onChange={handleChange} required />
+              <FormField label="Last Name" name="LastName" value={formData.LastName} onChange={handleChange} required />
+              <FormField label="Date of Birth" name="DOB" type="date" value={formData.DOB} onChange={handleChange} required />
+              <FormField label="Marital Status" name="MaritalStatus" type="select" value={formData.MaritalStatus} onChange={handleChange} required>
+                <option value="">Select...</option>
+                <option value="Single">Single</option>
+                <option value="Married">Married</option>
+                <option value="Divorced">Divorced</option>
               </FormField>
             </div>
           </fieldset>
 
+          {/* Contact */}
           <fieldset>
-            <legend className="text-lg font-semibold text-gray-700 mb-6">Contact Information</legend>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-              <FormField label="Email Address" name="EmailID" type="email" value={formData.emailId} onChange={handleChange} required className="md:col-span-2"/>
-              <FormField label="Mobile Number" name="Mobile" type="tel" value={formData.mobile} onChange={handleChange} required />
-              <FormField label="Phone Number" name="Phone" type="tel" value={formData.phone} onChange={handleChange} placeholder="Optional" />
+            <legend className="text-lg font-medium text-gray-700 mb-4">
+              Contact Information
+            </legend>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField label="Email Address" name="EmailID" type="email" value={formData.EmailID} onChange={handleChange} required className="md:col-span-2" />
+              <FormField label="Mobile Number" name="Mobile" type="tel" value={formData.Mobile} onChange={handleChange} required />
+              <FormField label="Phone Number" name="Phone" type="tel" value={formData.Phone} onChange={handleChange} placeholder="Optional" />
             </div>
           </fieldset>
-          
+
+          {/* Address */}
           <fieldset>
-            <legend className="text-lg font-semibold text-gray-700 mb-6">Address</legend>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-              <FormField label="Address Line 1" name="Address1" value={formData.address1} onChange={handleChange} required className="md:col-span-2"/>
-              <FormField label="Address Line 2" name="Address2" value={formData.address2} onChange={handleChange} placeholder="Optional" className="md:col-span-2"/>
-              <FormField label="Postal Code" name="ZIPCode" value={formData.postalCode} onChange={handlePostalCodeChange} required loading={isPostalLoading} error={postalError} />
-              <FormField label="City" name="CityName" value={formData.city} onChange={handleChange} readOnly />
-              <FormField label="State" name="StateName" value={formData.state} onChange={handleChange} readOnly />
-              <FormField label="Country" name="CountryName" value={formData.country} onChange={handleChange} readOnly />
+            <legend className="text-lg font-medium text-gray-700 mb-4">
+              Address
+            </legend>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField label="Address Line 1" name="Address1" value={formData.Address1} onChange={handleChange} required className="md:col-span-2" />
+              <FormField label="Address Line 2" name="Address2" value={formData.Address2} onChange={handleChange} placeholder="Optional" className="md:col-span-2" />
+              <FormField label="Postal Code" name="ZIPCode" value={formData.ZIPCode} onChange={handlePostalCodeChange} required loading={isPostalLoading} error={postalError} />
+              <FormField label="City" name="CityName" value={formData.CityName} onChange={handleChange}  />
+              <FormField label="State" name="StateName" value={formData.StateName} onChange={handleChange}  />
+              <FormField label="Country" name="CountryName" value={formData.CountryName} onChange={handleChange}  />
             </div>
           </fieldset>
-          
-          <div className="pt-6 mt-8 border-t border-gray-200">
-            {successMessage && <div className="flex items-center p-4 mb-4 text-sm text-green-800 bg-green-100 rounded-lg"><CheckCircle size={20} className="mr-3"/>{successMessage}</div>}
-            {submitError && <div className="flex items-center p-4 mb-4 text-sm text-red-800 bg-red-100 rounded-lg"><X size={20} className="mr-3"/>{submitError}</div>}
-            <div className="flex justify-end items-center gap-4">
+
+          {/* Submit */}
+          <div className="pt-4 border-t border-gray-200">
+            {successMessage && <div className="flex items-center p-3 mb-3 text-sm text-green-800 bg-green-100 rounded-md"><CheckCircle size={18} className="mr-2"/>{successMessage}</div>}
+            {submitError && <div className="flex items-center p-3 mb-3 text-sm text-red-800 bg-red-100 rounded-md"><X size={18} className="mr-2"/>{submitError}</div>}
+            <div className="flex justify-end gap-3">
               <button type="button" className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200">Cancel</button>
               <button type="submit" disabled={isSubmitting} className="flex items-center justify-center px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-blue-400">
                 {isSubmitting ? <Loader2 size={16} className="mr-2 animate-spin"/> : <Save size={16} className="mr-2"/>}
@@ -118,19 +137,18 @@ function AddCustomerPage() {
   );
 }
 
-// FormField component with an inline layout
 const FormField = ({ label, name, type = 'text', children, className = '', loading, error, ...props }) => {
   const InputComponent = type === 'select' ? 'select' : 'input';
-  
+
   return (
-    <div className={`grid grid-cols-1 sm:grid-cols-3 sm:items-start sm:gap-4 ${className}`}>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1 sm:mb-0 sm:pt-2">
-        {label}
-      </label>
-      <div className="relative sm:col-span-2">
+    <div className={`flex flex-col sm:flex-row sm:items-center gap-2 ${className}`}>
+      <label htmlFor={name} className="w-32 text-sm font-medium text-gray-700 shrink-0">{label}</label>
+      <div className="relative flex-1">
         <InputComponent
-          id={name} name={name} type={type}
-          className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm transition-colors ${props.readOnly ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500'}`}
+          id={name}
+          name={name}
+          type={type}
+          className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm ${props.readOnly ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500'}`}
           {...props}
         >
           {children}
@@ -143,3 +161,4 @@ const FormField = ({ label, name, type = 'text', children, className = '', loadi
 };
 
 export default AddCustomerPage;
+
