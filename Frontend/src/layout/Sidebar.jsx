@@ -18,7 +18,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
       }`}
     >
       {/* Header Section */}
-      <div className="h-20 flex items-center border-b border-slate-700 px-4 shrink-0">
+      <div className="h-16 flex items-center border-b border-slate-700 px-4 shrink-0">
         <button
           onClick={toggleSidebar}
           className="text-slate-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full p-2 transition-colors"
