@@ -140,7 +140,7 @@ class SavingAccountDetail(Base):
 class SavingAccountTxnHistory(Base):
     __tablename__ = "SavingAccountTxnHistory"
     TxnID = Column(Integer, primary_key=True, index=True)
-    TxnDate = Column(TIMESTAMP, nullable=False)
+    TxnDate = Column(Date, nullable=False)
     AcctNum = Column(
         BigInteger, ForeignKey("SavingAccountDetail.AcctNum", ondelete="CASCADE")
     )

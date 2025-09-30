@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const API_BASE = "http://localhost:8000";
 
-const Register = () => {
-  const navigate = useNavigate();
-
+export default function RegisterForm({ onSuccess }) {
   const [formData, setFormData] = useState({
     adminname: "",
     email: "",
@@ -46,18 +43,18 @@ const Register = () => {
       });
 
       if (res.status === 201 || res.status === 200) {
-        setSuccess("Registration successful — redirecting to login...");
-        // small delay so user can see success message
-        setTimeout(() => navigate("/login"), 900);
+        setSuccess("Registration successful!");
+        setTimeout(() => {
+          if (onSuccess) onSuccess(); // 🔥 parent switches to login
+        }, 800);
       } else {
         setError("Unexpected response from server");
       }
     } catch (err) {
-      // axios error handling
       if (err.response) {
-        // Server returned a response (4xx, 5xx)
         const status = err.response.status;
-        const detail = err.response.data?.detail || err.response.data || err.message;
+        const detail =
+          err.response.data?.detail || err.response.data || err.message;
         if (status === 409) setError(detail || "Username or email already exists");
         else if (status === 422) setError("Validation error — check your input");
         else setError(detail || "Server error. Try again later.");
@@ -72,84 +69,72 @@ const Register = () => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-sky-900 to-slate-800">
-      <div className="w-full max-w-md mx-4">
-        <div className="bg-white/6 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/6">
-          <div className="flex flex-col items-center text-center">
-            <h1 className="text-3xl font-bold text-white mb-6">Admin Registration</h1>
+    <form
+      className="flex flex-col justify-center items-center w-full"
+      onSubmit={handleSubmit}
+    >
+      <h2 className="text-2xl font-bold leading-relaxed text-gray-800">
+        Create Account
+      </h2>
+      <span className="mt-2 mb-4 text-sm text-gray-500">
+        or use your email for registration
+      </span>
 
-            <form className="w-full space-y-4" onSubmit={handleSubmit}>
-              <input
-                type="text"
-                name="adminname"
-                placeholder="Username"
-                value={formData.adminname}
-                onChange={handleChange}
-                className="w-full py-3 px-4 bg-white/10 placeholder-white/70 text-white rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
-                required
-                minLength={3}
-              />
+      <input
+        type="text"
+        name="adminname"
+        placeholder="Name"
+        value={formData.adminname}
+        onChange={handleChange}
+        className="w-2/3 h-10 my-1 pl-5 text-sm border-none outline-none bg-gray-100 rounded-lg shadow-inner"
+        required
+        minLength={3}
+      />
 
-              <input
-                type="email"
-                name="email"
-                placeholder="Admin Email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full py-3 px-4 bg-white/10 placeholder-white/70 text-white rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
-                required
-              />
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        value={formData.email}
+        onChange={handleChange}
+        className="w-2/3 h-10 my-1 pl-5 text-sm border-none outline-none bg-gray-100 rounded-lg shadow-inner"
+        required
+      />
 
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full py-3 px-4 bg-white/10 placeholder-white/70 text-white rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
-                required
-                minLength={8}
-              />
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        value={formData.password}
+        onChange={handleChange}
+        className="w-2/3 h-10 my-1 pl-5 text-sm border-none outline-none bg-gray-100 rounded-lg shadow-inner"
+        required
+        minLength={8}
+      />
 
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="w-full py-3 px-4 bg-white/10 placeholder-white/70 text-white rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
-                required
-                minLength={8}
-              />
+      <input
+        type="password"
+        name="confirmPassword"
+        placeholder="Confirm Password"
+        value={formData.confirmPassword}
+        onChange={handleChange}
+        className="w-2/3 h-10 my-1 pl-5 text-sm border-none outline-none bg-gray-100 rounded-lg shadow-inner"
+        required
+        minLength={8}
+      />
 
-              {error && <p className="text-red-400 text-sm">{error}</p>}
-              {success && <p className="text-emerald-300 text-sm">{success}</p>}
+      {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+      {success && <p className="text-green-500 text-xs mt-2">{success}</p>}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full py-3 px-4 text-white rounded-xl shadow-lg transition-transform ${
-                  loading ? "bg-slate-500/60" : "bg-gradient-to-r from-sky-400 to-indigo-500 hover:scale-[1.02]"
-                }`}
-              >
-                {loading ? "Registering..." : "Register"}
-              </button>
-            </form>
-
-            <p className="mt-4 text-white/70">
-              Already have an account?{" "}
-              <span
-                className="text-sky-300 cursor-pointer hover:underline"
-                onClick={() => navigate("/login")}
-              >
-                Login
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+      <button
+        type="submit"
+        disabled={loading}
+        className={`w-36 h-10 rounded-2xl mt-6 font-bold text-sm text-white ${
+          loading ? "bg-gray-400" : "bg-blue-600 hover:scale-105"
+        } transition-transform`}
+      >
+        {loading ? "Registering..." : "SIGN UP"}
+      </button>
+    </form>
   );
-};
-
-export default Register;
+}
