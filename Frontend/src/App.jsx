@@ -3,6 +3,9 @@ import React, { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import LoadingCard from './components/LoadingCard'
 import { CustomerProvider } from './context/CustomerContext'   // import provider
+import AuthProvider from './context/AuthProvider.jsx';
+import AddCustomerPage from './pages/AddCustomerPage.jsx'
+import Layout from './layout/Layout.jsx';
 
 const Welcome = lazy(() => import('./pages/Welcome'))
 const Login = lazy(() => import('./pages/Login'))
@@ -11,6 +14,7 @@ const CustomerPage = lazy(() => import('./pages/CustomerPage'))
 
 function App() {
   return (
+    <AuthProvider>
     <BrowserRouter>
       <Suspense fallback={<LoadingCard/>}>
         <Routes>
@@ -23,7 +27,9 @@ function App() {
             path="/customer"
             element={
               <CustomerProvider>
-                <CustomerPage />
+                <Layout >
+                <AddCustomerPage />
+                </Layout>
               </CustomerProvider>
             }
           />
@@ -31,6 +37,7 @@ function App() {
         
       </Suspense>
     </BrowserRouter>
+    </AuthProvider>
   )
 }
 
