@@ -1,44 +1,26 @@
 // src/pages/CustomerDashboard.jsx
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import CustomerContext from "../context/CustomerContext";
 
 export default function Dashboard({ onOpenAdvanceSearch }) {
-  const { searchedCustomer, searchCustomer } = useContext(CustomerContext);
-  const [hydrating, setHydrating] = useState(true);
+  const { searchedCustomer } = useContext(CustomerContext);
+
 
   // Hydrate from localStorage on mount to restore last selected customer
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const lastId = localStorage.getItem("selectedCustId");
-        if (!searchedCustomer && lastId) {
-          await searchCustomer(lastId);
-        }
-      } catch {
-        // ignore; render empty state if fetch fails
-      } finally {
-        if (!cancelled) setHydrating(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [searchedCustomer, searchCustomer]);
+  // useEffect(() => {
+  
+  //   (async () => {
+  //     try {
+  //       const lastId = localStorage.getItem("selectedCustId");
+  //       if (!searchedCustomer && lastId) {
+  //         await searchCustomer(lastId);
+  //       }
+  //     } catch {
+  //       // ignore; render empty state if fetch fails
+  //     } })();
+  // }, [searchedCustomer, searchCustomer]);
 
-  // Skeleton while hydrating from localStorage
-  if (hydrating) {
-    return (
-      <div className="animate-pulse space-y-3">
-        <div className="h-24 bg-white rounded-lg border border-slate-200" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="h-40 bg-white rounded-lg border border-slate-200" />
-          <div className="h-40 bg-white rounded-lg border border-slate-200" />
-          <div className="h-40 bg-white rounded-lg border border-slate-200" />
-        </div>
-      </div>
-    );
-  }
+
 
   // Empty state prompting Advance Search
   if (!searchedCustomer) {

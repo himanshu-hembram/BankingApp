@@ -1,5 +1,6 @@
 import { createContext, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAuthToken } from "../lib/api"; // use the centralized token helper
 
 const CustomerContext = createContext();
 
@@ -30,7 +31,7 @@ export const CustomerProvider = ({ children }) => {
     console.log(`Searching for customer with ID: ${customerId}`);
 
     try {
-      const token = localStorage.getItem("authToken");
+      const token = getAuthToken();
       if (!token) throw new Error("No auth token found — please login again.");
 
       const idStr = String(customerId).trim();
@@ -58,7 +59,7 @@ export const CustomerProvider = ({ children }) => {
       console.log("Customer found:", data);
 
       // ✅ Save customer ID separately
-      localStorage.setItem("selectedCustId", data.CustID);
+     // localStorage.setItem("selectedCustId", data.CustID);
     } catch (error) {
       console.error("Failed to fetch customer:", error);
       setSearchedCustomer(null);
@@ -68,7 +69,7 @@ export const CustomerProvider = ({ children }) => {
 
   const advanceSearchCustomers = useCallback(async (filters) => {
     try {
-      const token = localStorage.getItem("authToken");
+      const token = getAuthToken();
       if (!token) throw new Error("No auth token found — please login again.");
 
       const response = await fetch(`${API_BASE}/advSearch`, {
@@ -108,7 +109,7 @@ export const CustomerProvider = ({ children }) => {
       const method = isUpdateMode ? "PUT" : "POST";
 
       try {
-        const token = localStorage.getItem("authToken");
+        const token = getAuthToken();
         if (!token)
           throw new Error("No auth token found — please login again.");
 
@@ -156,7 +157,7 @@ export const CustomerProvider = ({ children }) => {
       )
     ) {
       try {
-        const token = localStorage.getItem("authToken");
+        const token = getAuthToken();
         if (!token)
           throw new Error("No auth token found — please login again.");
 
@@ -216,7 +217,7 @@ export const CustomerProvider = ({ children }) => {
   }
   const addAccount = useCallback(
     async (accountType, formData) => {
-      const token = localStorage.getItem("authToken");
+      const token = getAuthToken();
       if (!token) throw new Error("No auth token found — please login again.");
 
       // Resolve customer id from localStorage first (as set by searchCustomer)
@@ -286,8 +287,6 @@ export const CustomerProvider = ({ children }) => {
     },
     [searchedCustomer]
   );
-
-
 
   const value = useMemo(
     () => ({
