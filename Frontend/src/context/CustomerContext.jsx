@@ -186,6 +186,106 @@ export const CustomerProvider = ({ children }) => {
     }
   }, [searchedCustomer]);
 
+  function buildAccountPayload(accountType, formData) {
+    if (accountType === "loan") {
+      return {
+        // Server expects PascalCase based on your curl
+        AccountType: "loan",
+        AccSubType: formData.accSubType ?? "",
+        TotalLoanAmount: formData.totalLoanAmount
+          ? Number(formData.totalLoanAmount)
+          : 0,
+        RateOfInterest: formData.rateOfInterest
+          ? Number(formData.rateOfInterest)
+          : 0,
+        LoanDuration: formData.loanDuration ?? "",
+        BranchCode: formData.branchCode ?? "",
+      };
+    }
+    // default: savings
+    return {
+      AccountType: "savings", // fallback (can map from a form field if needed)
+      AccSubType: formData.accSubType ?? "",
+      Balance: formData.balance ? Number(formData.balance) : 0,
+      TransferLimit: formData.transferLimit
+        ? Number(formData.transferLimit)
+        : 0,
+      BranchCode: formData.branchCode ?? "",
+    };
+  }
+  const addAccount = useCallback(
+    async (accountType, formData) => {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("No auth token found — please login again.");
+
+      // Resolve customer id from localStorage first (as set by searchCustomer)
+      const storedId = localStorage.getItem("selectedCustId");
+      const ctxId =
+        searchedCustomer?.CustID ??
+        searchedCustomer?.custId ??
+        searchedCustomer?.id;
+      const customerId = String(storedId ?? ctxId ?? "").trim();
+
+      if (!customerId)
+        throw new Error("No customer selected. Please pick a customer first.");
+
+      // Path segment must match API: 'savings' or 'loans'
+      const pathType = accountType === "loans" ? "loan" : "savings";
+      const url = `${API_BASE}/${encodeURIComponent(
+        customerId
+      )}/${encodeURIComponent(pathType)}`;
+
+      const payload = buildAccountPayload(pathType, formData);
+      console.log("Creating account with payload:", payload);
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      // Clear selected customer id from localStorage after successful account creation
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            "Unauthorized — token may be expired. Please log in again."
+          );
+        } else if (response.status === 404) {
+          throw new Error("Customer not found.");
+        } else {
+          throw new Error(
+            `Failed to create account. Status: ${response.status}`
+          );
+        }
+      }
+      localStorage.removeItem("selectedCustId");
+      setSearchedCustomer(null);
+
+      const created = await response.json();
+
+      // Merge into context so UI updates immediately
+      setSearchedCustomer((prev) => {
+        if (!prev) return prev;
+        const existing =
+          prev.accounts ?? prev.Accounts ?? prev.accountList ?? [];
+        return {
+          ...prev,
+          accounts: Array.isArray(existing)
+            ? [...existing, created]
+            : [created],
+        };
+      });
+
+      return created; // caller can navigate on truthy result
+    },
+    [searchedCustomer]
+  );
+
   const value = useMemo(
     () => ({
       isDialogOpen,
@@ -197,6 +297,7 @@ export const CustomerProvider = ({ children }) => {
       deleteCustomer,
       searchCustomer,
       advanceSearchCustomers,
+      addAccount,
     }),
     [
       isDialogOpen,
@@ -208,6 +309,7 @@ export const CustomerProvider = ({ children }) => {
       deleteCustomer,
       searchCustomer,
       advanceSearchCustomers,
+      addAccount,
     ]
   );
 

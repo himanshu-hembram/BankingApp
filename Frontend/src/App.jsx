@@ -6,6 +6,8 @@ import { CustomerProvider } from './context/CustomerContext'   // import provide
 import AuthProvider from './context/AuthProvider.jsx';
 import AddCustomerPage from './pages/AddCustomerPage.jsx'
 import Layout from './layout/Layout.jsx';
+import Dashboard from './pages/Dashboard.jsx'
+import AddAccount from './pages/AddAccount.jsx'
 
 const Welcome = lazy(() => import('./pages/Welcome'))
 const Login = lazy(() => import('./pages/Login'))
@@ -33,6 +35,27 @@ function App() {
               </CustomerProvider>
             }
           />
+          <Route
+            path="/dashboard"
+            element={
+              <CustomerProvider>
+                <Layout >
+                <Dashboard/>
+                </Layout>
+              </CustomerProvider>
+            }
+          />
+          <Route
+            path="/add-account"
+            element={
+              <CustomerProvider>
+                <Layout >
+                <AddAccount/>
+                </Layout>
+              </CustomerProvider>
+            }
+          />
+
         </Routes>
         
       </Suspense>
