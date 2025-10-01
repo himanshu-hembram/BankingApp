@@ -8,6 +8,8 @@ from app.crud.customer import get_customer_by_id, update_customer
 from app.security.deps import get_current_admin
 from app.crud.customer import delete_customer
 import sqlalchemy as sa
+from decimal import Decimal
+from typing import Optional
 
 from app.models import CustomerDetail
 from app.schemas.customer import AdvSearchRequest, AdvSearchResponseItem
@@ -119,10 +121,11 @@ async def get_customer(
             transactions = [
                 SavingTxnOut(
                     TxnID=txn.TxnID,
-                    TxnType=txn.TxnType,
+                    TxnDetail=txn.TxnDetail,
                     TxnDate=txn.TxnDate,
-                    TxnAmount=float(txn.TxnAmount or 0),
-                    Balance=float(txn.Balance or 0),
+                    WithdrawAmount=txn.WithdrawAmount or Decimal("0.00"),
+                    DepositAmount=txn.DepositAmount or Decimal("0.00"),
+                    Balance=txn.Balance or Decimal("0.00"),
                 )
                 for txn in (acc.saving_detail.transactions or [])
             ]
