@@ -161,7 +161,6 @@ class SavingAccountCreate(BaseModel):
 class LoanAccountCreate(BaseModel):
     AccountType: str                  # e.g. "Loan"
     AccSubType: Optional[str] = None
-    EMIID: int
     BalanceAmount: Decimal18_2
     BranchCode: str
     RateOfInterest: Decimal5_2

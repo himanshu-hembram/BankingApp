@@ -125,9 +125,11 @@ async def create_loan_account(
 
     ca = await create_customer_account_with_random_acctnum(db, cust_id, at.AccountTypeID)
 
+    emiID = random.randint(100000, 999999)
+
     ld = LoanAccountDetail(
         AcctNum=ca.AcctNum,
-        EMIID=payload.EMIID,
+        EMIID=emiID,
         BalanceAmount=payload.BalanceAmount,
         BranchCode=payload.BranchCode,
         RateOfInterest=payload.RateOfInterest,
@@ -149,5 +151,5 @@ async def create_loan_account(
         "AccountTypeID": at.AccountTypeID,
         "AccountType": at.AccountType,
         "AccSubType": at.AccSubType,
-        "EMIID": payload.EMIID,
+        "EMIID": emiID,
     }

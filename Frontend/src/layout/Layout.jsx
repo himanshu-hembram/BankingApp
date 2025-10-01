@@ -25,7 +25,7 @@ function Layout({ children }) {
         <Header onOpenAdvanceSearch={() => setAdvOpen(true)} />
         <main className="flex-1 overflow-y-auto">
           {/* Full width content wrapper */}
-          <div className="w-full px-4 py-4 md:px-6">
+          <div className="w-full">
             {children}
           </div>
         </main>
