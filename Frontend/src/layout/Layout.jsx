@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import AdvanceSearch from '../components/AdvanceSearch';
 
 function Layout({ children }) {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isAdvOpen, setAdvOpen] = useState(false);
 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
@@ -20,13 +22,18 @@ function Layout({ children }) {
           isSidebarOpen ? 'ml-64' : 'ml-20'
         }`}
       >
-        <Header />
+        <Header onOpenAdvanceSearch={() => setAdvOpen(true)} />
         <main className="flex-1 overflow-y-auto">
           {/* Full width content wrapper */}
           <div className="w-full">
             {children}
           </div>
         </main>
+
+        <AdvanceSearch isOpen={isAdvOpen}
+        onClose={() => setAdvOpen(false)}
+        />
+
       </div>
     </div>
   );

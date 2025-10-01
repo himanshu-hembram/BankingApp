@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth.js';
 import { Search, UserCircle, LogOut, ChevronDown, Filter } from 'lucide-react';
 
-function Header() {
+function Header({onOpenAdvanceSearch}) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -14,11 +14,11 @@ function Header() {
     navigate('/');
   };
 
-  const handleAdvancedSearchClick = () => {
-    // Implement your advanced search logic here
-    // For now, it will show an alert.
-    alert('Advanced Search filter clicked!');
-  };
+  // const handleAdvancedSearchClick = () => {
+  //   // Implement your advanced search logic here
+  //   // For now, it will show an alert.
+  //   alert('Advanced Search filter clicked!');
+  // };
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -45,7 +45,7 @@ function Header() {
             placeholder="Search..." 
           />
           <button
-            onClick={handleAdvancedSearchClick}
+            onClick={onOpenAdvanceSearch}
             className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-white transition-colors"
             aria-label="Advanced search"
           >

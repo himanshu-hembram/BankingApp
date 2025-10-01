@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, UserPlus, FolderPlus, Menu } from 'lucide-react';
 
 const navLinks = [
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/customer', label: 'Add Customer', icon: UserPlus },
   { path: '/add-account', label: 'Add Account', icon: FolderPlus },
 ];
