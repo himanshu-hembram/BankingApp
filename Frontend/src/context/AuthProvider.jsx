@@ -14,7 +14,7 @@ export default function AuthProvider({ children }) {
       setAuthToken(token); // Re-configure Axios on page load
       setUser(userInfo);   // Set the user state in React
     }
-  }, [user]);
+  }, []);
 
   // The login function now uses your helpers to store data.
   const login = (token, userData) => {
