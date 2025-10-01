@@ -198,6 +198,7 @@ export const CustomerProvider = ({ children }) => {
         RateOfInterest: formData.rateOfInterest
           ? Number(formData.rateOfInterest)
           : 0,
+          BalanceAmount:0,
         LoanDuration: formData.loanDuration ?? "",
         BranchCode: formData.branchCode ?? "",
       };
@@ -285,6 +286,8 @@ export const CustomerProvider = ({ children }) => {
     },
     [searchedCustomer]
   );
+
+
 
   const value = useMemo(
     () => ({
