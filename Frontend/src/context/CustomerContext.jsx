@@ -288,6 +288,8 @@ export const CustomerProvider = ({ children }) => {
     [searchedCustomer]
   );
 
+
+
   const value = useMemo(
     () => ({
       isDialogOpen,
