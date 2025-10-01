@@ -91,10 +91,12 @@ class PostalCodeOut(BaseModel):
 
 class SavingTxnOut(BaseModel):
     TxnID: int
-    TxnType: str
+    TxnType: str | None = None
+    TxnDetail: str | None = None
     TxnDate: date
-    TxnAmount: float
-    Balance: float
+    WithdrawAmount: Optional[Decimal] = Decimal("0.00")
+    DepositAmount: Optional[Decimal] = Decimal("0.00")
+    Balance: Optional[Decimal] = Decimal("0.00")
 
     class Config:
         from_attributes = True
