@@ -5,7 +5,6 @@ from app.schemas.customer import CustomerCreate, CustomerOut, CustomerUpdate, Cu
 from app.crud.customer import get_customer_full_by_id
 from app.crud.customer import create_customer, get_customer_by_email
 from app.crud.customer import get_customer_by_id, update_customer
-from app.security.deps import get_current_admin
 from app.crud.customer import delete_customer
 import sqlalchemy as sa
 from decimal import Decimal
@@ -13,13 +12,13 @@ from typing import Optional
 
 from app.models import CustomerDetail
 from app.schemas.customer import AdvSearchRequest, AdvSearchResponseItem
-
+from app.security.combined import authorize_user
 
 router = APIRouter(prefix="/customers", tags=["customers"])
 
 
 @router.post("/", response_model=CustomerOut, status_code=status.HTTP_201_CREATED)
-async def add_customer(payload: CustomerCreate, db: AsyncSession = Depends(get_db), admin=Depends(get_current_admin)):
+async def add_customer(payload: CustomerCreate, db: AsyncSession = Depends(get_db), admin = Depends(authorize_user)):
     """Create a new customer. Only authenticated admins may call this endpoint.
 
     admin parameter is consumed to ensure the dependency runs (and will 401 if token is invalid).
@@ -39,7 +38,7 @@ async def add_customer(payload: CustomerCreate, db: AsyncSession = Depends(get_d
 
 
 @router.put("/{cust_id}", response_model=CustomerUpdateResponse)
-async def update_customer_route(cust_id: int, payload_raw: dict = Body(...), db: AsyncSession = Depends(get_db), admin=Depends(get_current_admin)):
+async def update_customer_route(cust_id: int, payload_raw: dict = Body(...), db: AsyncSession = Depends(get_db), admin = Depends(authorize_user)):
     """Update an existing customer by CustID. The payload should include fields to update (same schema as create).
 
     If ZIPCode is changed to a non-existing ZIP, you must include CityName, StateName and CountryName to create the postal hierarchy.
@@ -107,7 +106,7 @@ async def update_customer_route(cust_id: int, payload_raw: dict = Body(...), db:
 async def get_customer(
     cust_id: int,
     db: AsyncSession = Depends(get_db),
-    admin = Depends(get_current_admin),
+    admin = Depends(authorize_user)
 ):
     cust = await get_customer_full_by_id(db, cust_id)
     if not cust:
@@ -189,7 +188,7 @@ async def get_customer(
 async def delete_customer_route(
     identifier: str,
     db: AsyncSession = Depends(get_db),
-    admin=Depends(get_current_admin),
+    admin = Depends(authorize_user)
 ):
     """
     Delete a customer by CustID (int) or EmailID (string).
