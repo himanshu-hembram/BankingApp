@@ -24,13 +24,23 @@ export function getAuthToken() {
 
 // user info helper
 export function setUserInfo(user) {
-  if (user) localStorage.setItem('user_info', JSON.stringify(user));
-  else localStorage.removeItem('user_info');
+  if (user === null || user === undefined) {
+    localStorage.removeItem('user_info');
+  } else if (typeof user === 'object') {
+    localStorage.setItem('user_info', JSON.stringify(user));
+  } else {
+    localStorage.setItem('user_info', String(user));
+  }
 }
 
 export function getUserInfo() {
   const v = localStorage.getItem('user_info');
-  return v ? v : null;
+  if (!v) return null;
+  try {
+    return JSON.parse(v);
+  } catch {
+    return v; // fallback: return as string if not JSON
+  }
 }
 
 export default api;
