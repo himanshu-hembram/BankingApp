@@ -8,6 +8,7 @@ from app.routes.admin import router as admin_router
 from app.routes.customers import router as customers_router
 from app.routes.account import router as account_router
 from app.routes.savings_txn import router as savings_txn_router
+# from app.routes.admin_sso import router as admin_sso_router
 
 app = FastAPI()
 
@@ -30,6 +31,7 @@ app.add_middleware(
 
 # Register routers
 app.include_router(admin_router)
+# app.include_router(admin_sso_router)
 app.include_router(customers_router)
 app.include_router(account_router)
 app.include_router(savings_txn_router)

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/useAuth.js";
 
@@ -10,6 +10,25 @@ export default function LoginForm({ onSuccess }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    if (token) {
+      localStorage.setItem('auth_Token', token);
+      window.location.href = '/dashboard';
+    }
+  }, []);
+
+  const handleLogin = () => {
+    // Production SSO service URL
+    const ssoUrl = "https://jktech-auth-gateway-140475459295.asia-south1.run.app";
+    // const returnUrl = `${window.location.origin}/auth/callback`;
+    const returnUrl = `http://localhost:5173/dashboard`;
+    window.location.href = `${ssoUrl}/login?app_url=${encodeURIComponent(returnUrl)}`;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -83,6 +102,13 @@ export default function LoginForm({ onSuccess }) {
       >
         {loading ? "Signing in..." : "SIGN IN"}
       </button>
+      <button 
+      type="submit"
+        disabled={loading}
+        className={`w-36 h-10 rounded-2xl mt-6 font-bold text-xs text-white shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#f9f9f9] ${
+          loading ? "bg-gray-400" : "bg-blue-600 hover:scale-105"
+        } transition-transform`}
+      onClick={handleLogin}>Login with Microsoft</button>
     </form>
   );
 }
