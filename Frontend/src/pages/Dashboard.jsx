@@ -53,7 +53,11 @@ export default function Dashboard({ onOpenAdvanceSearch }) {
   const initials =
     [firstName?.[0], lastName?.[0]].filter(Boolean).join("").toUpperCase() ||
     "?";
-
+  const address = `${searchedCustomer.zipcode.city.CityName},
+   ${searchedCustomer.zipcode.city.state.StateName}, 
+   ${searchedCustomer.zipcode.city.state.country.CountryName},
+    ${searchedCustomer.Address1}, ${searchedCustomer.Address2} 
+    - ${searchedCustomer.ZIPCode}`;
   // Transaction extraction
   const transactions =
     Array.isArray(accounts) && accounts.length > 0
@@ -124,6 +128,9 @@ export default function Dashboard({ onOpenAdvanceSearch }) {
               <p className="text-slate-600">
                 Email: <span className="text-slate-900">{email || "—"}</span>
               </p>
+              <p className="text-slate-600">
+                Address: <span className="text-slate-900">{address || "—"}</span>
+              </p>
             </div>
           </div>
 
@@ -190,44 +197,61 @@ export default function Dashboard({ onOpenAdvanceSearch }) {
         </div>
       </div>
 
-      {/* Email and Transaction Details Table */}
+      
       <div className="bg-white shadow rounded-xl border border-slate-200 mt-6 p-6">
       
         
-        <div>
-          <table className="min-w-full border border-slate-300 rounded">
-            <thead className="bg-slate-100">
-              <tr>
-                <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Txn ID</th>
-                <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Detail</th>
-                <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Date</th>
-                <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Withdraw</th>
-                <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Deposit</th>
-                <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.length > 0 ? (
-                transactions.map((txn) => (
-                  <tr key={txn.TxnID}>
-                    <td className="px-3 py-2 text-sm text-slate-800">{txn.TxnID}</td>
-                    <td className="px-3 py-2 text-sm text-slate-800">{txn.TxnDetail || "—"}</td>
-                    <td className="px-3 py-2 text-sm text-slate-800">{txn.TxnDate}</td>
-                    <td className="px-3 py-2 text-sm text-slate-800">{txn.WithdrawAmount}</td>
-                    <td className="px-3 py-2 text-sm text-slate-800">{txn.DepositAmount}</td>
-                    <td className="px-3 py-2 text-sm text-slate-800">{txn.Balance}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="px-3 py-2 text-center text-slate-500">
-                    No transactions found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <div className="w-full overflow-x-auto">
+  <table className="min-w-full w-full border border-slate-300 rounded">
+    <colgroup>
+      <col className="w-[10ch]" />
+      <col />
+      <col className="w-[12ch]" />
+      <col className="w-[12ch]" />
+      <col className="w-[12ch]" />
+      <col className="w-[14ch]" />
+    </colgroup>
+
+    <thead className="bg-slate-100">
+      <tr>
+        <th className="px-4 py-2 text-left text-sm font-semibold text-slate-700 whitespace-nowrap">Txn ID</th>
+        <th className="px-48 py-2 text-left text-sm font-semibold text-slate-700">Detail</th>
+        <th className="px-4 py-2 text-left text-sm font-semibold text-slate-700 whitespace-nowrap">Date</th>
+        <th className="px-4 py-2 text-right text-sm font-semibold text-slate-700 whitespace-nowrap">Withdraw</th>
+        <th className="px-4 py-2 text-right text-sm font-semibold text-slate-700 whitespace-nowrap">Deposit</th>
+        <th className="px-4 py-2 text-right text-sm font-semibold text-slate-700 whitespace-nowrap">Balance</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {transactions.length > 0 ? (
+        transactions.map((txn) => (
+          <tr key={txn.TxnID} className="bg-white">
+            <td className="px-4 py-2 text-sm text-slate-800 whitespace-nowrap">{txn.TxnID}</td>
+            <td className="px-4 py-2 text-sm text-slate-800">{txn.TxnDetail || "—"}</td>
+            <td className="px-4 py-2 text-sm text-slate-800 whitespace-nowrap">{txn.TxnDate}</td>
+            <td className="px-4 py-2 text-sm text-slate-800 text-right tabular-nums whitespace-nowrap">
+              {txn.WithdrawAmount ?? "—"}
+            </td>
+            <td className="px-4 py-2 text-sm text-slate-800 text-right tabular-nums whitespace-nowrap">
+              {txn.DepositAmount ?? "—"}
+            </td>
+            <td className="px-4 py-2 text-sm text-slate-800 text-right tabular-nums whitespace-nowrap">
+              {txn.Balance ?? "—"}
+            </td>
+          </tr>
+        ))
+      ) : (
+        <tr>
+          <td colSpan={6} className="px-4 py-2 text-center text-slate-500 bg-white">
+            No transactions found.
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
+
       </div>
     </div>
   );
