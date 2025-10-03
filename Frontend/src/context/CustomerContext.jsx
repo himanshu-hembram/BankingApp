@@ -12,14 +12,41 @@ export const CustomerProvider = ({ children }) => {
   const [currentCustomer, setCurrentCustomer] = useState(null);
   const [searchedCustomer, setSearchedCustomer] = useState(null);
   const navigate = useNavigate();
+  
 
-  const openDialog = useCallback((customerData = null) => {
+  // const openDialog = useCallback((customerData = null) => {
+  //   setCurrentCustomer(customerData);
+  //   console.log("Opening dialog for customer:", customerData);
+  //   setIsUpdateMode(Boolean(customerData));
+  //   console.log("isUpdateMode set to:", Boolean(customerData));
+  //   setIsDialogOpen(true);
+  // }, []);
+
+  const openDialog = useCallback(
+  (customerData = null) => {
     setCurrentCustomer(customerData);
-    console.log("Opening dialog for customer:", customerData);
-    setIsUpdateMode(Boolean(customerData));
-    console.log("isUpdateMode set to:", Boolean(customerData));
-    setIsDialogOpen(true);
-  }, []);
+    const isUpdate = Boolean(customerData);
+    setIsUpdateMode(isUpdate);
+
+    // Persist selected customer id for downstream pages (optional but useful)
+    if (customerData) {
+      const cid =
+        customerData.CustID ??
+        customerData.custId ??
+        customerData.id ??
+        "";
+      if (cid) localStorage.setItem("selectedCustId", String(cid));
+    }
+
+    // We're navigating to a dedicated page, so no dialog here
+    setIsDialogOpen(false);
+
+    // Navigate to the Update Customer route (change path if your route differs)
+    navigate("/update-customer");
+  },
+  [navigate]
+);
+
 
   const closeDialog = useCallback(() => {
     setIsDialogOpen(false);
