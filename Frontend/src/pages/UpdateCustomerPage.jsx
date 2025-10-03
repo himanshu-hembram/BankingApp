@@ -58,9 +58,9 @@ function UpdateCustomerPage() {
       DOB: searchedCustomer.DOB ?? searchedCustomer.dob ?? '',
       MaritalStatus: searchedCustomer.MaritalStatus ?? searchedCustomer.maritalStatus ?? '',
       ZIPCode: searchedCustomer.ZIPCode ?? searchedCustomer.zip ?? searchedCustomer.postalCode ?? '',
-      CityName: searchedCustomer.CityName ?? searchedCustomer.city ?? '',
-      StateName: searchedCustomer.StateName ?? searchedCustomer.state ?? '',
-      CountryName: searchedCustomer.CountryName ?? searchedCustomer.country ?? '',
+      CityName: searchedCustomer.zipcode?.city?.CityName ?? searchedCustomer.city ?? '',
+      StateName: searchedCustomer.zipcode?.city?.state?.StateName ?? searchedCustomer.state ?? '',
+      CountryName: searchedCustomer.zipcode?.city?.state?.country?.CountryName ?? searchedCustomer.country ?? '',
     });
   }, [searchedCustomer]);
 

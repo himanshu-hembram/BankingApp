@@ -1,13 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth.js';
 import { Search, UserCircle, LogOut, ChevronDown, Filter } from 'lucide-react';
+import CustomerContext from '../context/CustomerContext';
 
 function Header({onOpenAdvanceSearch}) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const {searchCustomer} =useContext(CustomerContext);
+  const [searchId, setSearchId] = useState('');
 
   const handleLogout = () => {
     logout();
@@ -19,6 +22,10 @@ function Header({onOpenAdvanceSearch}) {
   //   // For now, it will show an alert.
   //   alert('Advanced Search filter clicked!');
   // };
+  function handleSearch() {
+    
+    searchCustomer(searchId)
+  }
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -36,14 +43,23 @@ function Header({onOpenAdvanceSearch}) {
       {/* Left Side: Search Functionality */}
       <div className="flex-1 flex justify-start">
         <div className="relative w-full max-w-xs sm:max-w-sm">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search size={20} className="text-slate-400" />
-          </span>
           <input 
             type="text" 
-            className="w-full py-2 pl-10 pr-12 text-white bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-slate-600 transition" 
+            value={searchId}
+             onChange={(e) => setSearchId(e.target.value)}
+            className="w-full py-2 pl-10 pr-20 text-white bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-slate-600 transition" 
             placeholder="Search..." 
           />
+          {/* Search button */}
+          <button
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-white transition-colors"
+            aria-label="Search"
+            onClick={handleSearch} // Add your search handler here
+            style={{ right: '2.5rem' }} // Position before filter button
+          >
+            <Search size={18} />
+          </button>
+          {/* Filter button */}
           <button
             onClick={onOpenAdvanceSearch}
             className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-white transition-colors"

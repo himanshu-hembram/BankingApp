@@ -9,7 +9,7 @@ export default function Welcome() {
 
   // Callback for successful login
   const handleLoginSuccess = () => {
-    navigate("/customer");
+    navigate("/dashboard");
   };
 
   // Callback for successful registration
