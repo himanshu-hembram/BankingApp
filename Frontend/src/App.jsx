@@ -8,6 +8,7 @@ import AddCustomerPage from './pages/AddCustomerPage.jsx'
 import Layout from './layout/Layout.jsx';
 import Dashboard from './pages/Dashboard.jsx'
 import AddAccount from './pages/AddAccount.jsx'
+import UpdateCustomerPage from './pages/UpdateCustomerPage.jsx'
 
 const Welcome = lazy(() => import('./pages/Welcome'))
 const Login = lazy(() => import('./pages/Login'))
@@ -51,6 +52,16 @@ function App() {
               <CustomerProvider>
                 <Layout >
                 <AddAccount/>
+                </Layout>
+              </CustomerProvider>
+            }
+          />
+          <Route
+            path="/update-customer"
+            element={
+              <CustomerProvider>
+                <Layout >
+                <UpdateCustomerPage/>
                 </Layout>
               </CustomerProvider>
             }
