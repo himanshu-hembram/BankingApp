@@ -86,7 +86,7 @@ function Header({onOpenAdvanceSearch}) {
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-slate-800 rounded-xl shadow-lg py-2 z-20 ring-1 ring-slate-700">
                 <div className="px-4 py-2 border-b border-slate-700">
-                  <p className="font-semibold text-white">{user.userName}</p>
+                  {/* <p className="font-semibold text-white">{user.userName}</p> */}
                   <p className="text-xs text-slate-400 truncate">{user.userEmailid}</p>
                 </div>
                 <div className="p-2">
