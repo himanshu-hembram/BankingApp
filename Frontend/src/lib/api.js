@@ -30,7 +30,7 @@ export function setUserInfo(user) {
 
 export function getUserInfo() {
   const v = localStorage.getItem('user_info');
-  return v ? JSON.parse(v) : null;
+  return v ? v : null;
 }
 
 export default api;

@@ -9,6 +9,9 @@ import Layout from './layout/Layout.jsx';
 import Dashboard from './pages/Dashboard.jsx'
 import AddAccount from './pages/AddAccount.jsx'
 import UpdateCustomerPage from './pages/UpdateCustomerPage.jsx'
+import AuthCallback from './context/AuthCallback.jsx';
+
+// Lazy load components for code splitting
 
 const Welcome = lazy(() => import('./pages/Welcome'))
 const Login = lazy(() => import('./pages/Login'))
@@ -24,6 +27,7 @@ function App() {
           <Route path="/" element={<Welcome />} />
           {/* <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} /> */}
+          <Route path="/auth/callback" element={<AuthCallback />} />
 
           {/* Wrap only this route in CustomerProvider */}
           <Route
