@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard.jsx'
 import AddAccount from './pages/AddAccount.jsx'
 import UpdateCustomerPage from './pages/UpdateCustomerPage.jsx'
 import AuthCallback from './context/AuthCallback.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 // Lazy load components for code splitting
 
@@ -33,43 +34,62 @@ function App() {
           <Route
             path="/customer"
             element={
-              <CustomerProvider>
-                <Layout >
-                <AddCustomerPage />
-                </Layout>
-              </CustomerProvider>
+              <ProtectedRoute>
+                <CustomerProvider>
+                  <Layout >
+                  <AddCustomerPage />
+                  </Layout>
+                </CustomerProvider>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/dashboard"
             element={
-              <CustomerProvider>
-                <Layout >
-                <Dashboard/>
-                </Layout>
-              </CustomerProvider>
+              <ProtectedRoute>
+                <CustomerProvider>
+                  <Layout >
+                  <Dashboard/>
+                  </Layout>
+                </CustomerProvider>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/add-account"
             element={
-              <CustomerProvider>
-                <Layout >
-                <AddAccount/>
-                </Layout>
-              </CustomerProvider>
+              <ProtectedRoute>
+                <CustomerProvider>
+                  <Layout >
+                  <AddAccount/>
+                  </Layout>
+                </CustomerProvider>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/add-account"
+            element={
+              <ProtectedRoute>
+                <CustomerProvider>
+                  <Layout >
+                  <AddAccount/>
+                  </Layout>
+                </CustomerProvider>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/update-customer"
             element={
-              <CustomerProvider>
-                <Layout >
-                <UpdateCustomerPage/>
-                </Layout>
-              </CustomerProvider>
+              <ProtectedRoute>
+                <CustomerProvider>
+                  <Layout >
+                  <UpdateCustomerPage/>
+                  </Layout>
+                </CustomerProvider>
+              </ProtectedRoute>
             }
-
           />
 <Route path='*' element={<div className='text-center mt-20 text-3xl font-bold'>404 Not Found</div>} />
         </Routes>
