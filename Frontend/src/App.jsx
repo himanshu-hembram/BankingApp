@@ -69,8 +69,9 @@ function App() {
                 </Layout>
               </CustomerProvider>
             }
-          />
 
+          />
+<Route path='*' element={<div className='text-center mt-20 text-3xl font-bold'>404 Not Found</div>} />
         </Routes>
         
       </Suspense>
