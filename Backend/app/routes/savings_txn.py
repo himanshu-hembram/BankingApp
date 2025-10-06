@@ -9,6 +9,7 @@ from app.schemas.customer import SavingDepositRequest
 from app.schemas.customer import SavingWithdrawRequest
 from datetime import date, datetime
 import random
+from app.security.combined import authorize_user
 
 router = APIRouter(prefix="/customers", tags=["savings-transactions"])
 
@@ -39,6 +40,7 @@ async def deposit_to_savings(
     cust_id: int,
     payload: SavingDepositRequest,
     db: AsyncSession = Depends(get_db),
+    admin=Depends(authorize_user)
 ):
     # Verify account belongs to this customer
     if not await acct_belongs_to_customer(db, cust_id, payload.AcctNum):
@@ -132,6 +134,7 @@ async def withdraw_from_savings(
     cust_id: int,
     payload: SavingWithdrawRequest,
     db: AsyncSession = Depends(get_db),
+    admin=Depends(authorize_user)
 ):
     # 1) Verify account ownership
     if not await acct_belongs_to_customer(db, cust_id, payload.AcctNum):

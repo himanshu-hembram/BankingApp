@@ -10,6 +10,7 @@ from app.models import (
     SavingAccountDetail, LoanAccountDetail
 )
 from app.schemas.customer import SavingAccountCreate, LoanAccountCreate
+from app.security.combined import authorize_user
 
 import random
 
@@ -77,7 +78,7 @@ async def create_customer_account_with_random_acctnum(
 @router.post("/{cust_id}/savings", status_code=status.HTTP_201_CREATED)
 async def create_savings_account(
     cust_id: int, payload: SavingAccountCreate, db: AsyncSession = Depends(get_db),
-    admin=Depends(get_current_admin)
+    admin=Depends(authorize_user)
 ):
     if not await customer_exists(db, cust_id):
         raise HTTPException(status_code=404, detail="Customer not found")
@@ -114,7 +115,7 @@ async def create_savings_account(
 @router.post("/{cust_id}/loan", status_code=status.HTTP_201_CREATED)
 async def create_loan_account(
     cust_id: int, payload: LoanAccountCreate, db: AsyncSession = Depends(get_db),
-    admin=Depends(get_current_admin)
+    admin=Depends(authorize_user)
 ):
     if not await customer_exists(db, cust_id):
         raise HTTPException(status_code=404, detail="Customer not found")
