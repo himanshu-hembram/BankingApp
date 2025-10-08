@@ -1,9 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field, condecimal
-from typing import Annotated, Optional
+from typing import Annotated, Optional, List
 from datetime import date, datetime
 from decimal import Decimal
-
-
 
 
 class CustomerCreate(BaseModel):
@@ -201,3 +199,33 @@ class SavingWithdrawRequest(BaseModel):
     TxnDate: str
     TxnDetail: str | None = None
 
+
+Decimal18_2 = Annotated[Decimal, condecimal(max_digits=18, decimal_places=2)]
+
+
+class SavingAccountUpdateRequest(BaseModel):
+    AcctNum: int = Field(..., gt=0)
+    TransferLimit: Optional[Decimal18_2] = None
+    BranchCode: Optional[str] = None
+    # New inputs from user
+    AccountType: Optional[str] = None
+    AccSubType: Optional[str] = None
+
+
+class SavingAccountDetailOut(BaseModel):
+    AcctNum: int
+    SavingAccTypeId: Optional[int] = None
+    Balance: Optional[Decimal] = None
+    TransferLimit: Optional[Decimal] = None
+    BranchCode: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+
+class SavingAccountUpdateResponse(BaseModel):
+    message: str
+    updated_columns: List[str]
+    account_type_id: int
+    saving_detail: SavingAccountDetailOut
