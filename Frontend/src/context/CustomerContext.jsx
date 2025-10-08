@@ -316,6 +316,122 @@ export const CustomerProvider = ({ children }) => {
   );
 
 
+  const makeDeposit = useCallback(async (formData) => {
+  try {
+    const token = getAuthToken();
+    if (!token) throw new Error("No auth token found — please login again.");
+
+    // Resolve customer ID from localStorage or searchedCustomer
+    const storedId = localStorage.getItem("selectedCustId");
+    const ctxId =
+      searchedCustomer?.CustID ??
+      searchedCustomer?.custId ??
+      searchedCustomer?.id;
+    const customerId = String(storedId ?? ctxId ?? "").trim();
+    if (!customerId)
+      throw new Error("No customer selected. Please select a customer first.");
+
+    // Endpoint: POST /customers/{id}/savings/deposit
+    const url = `${API_BASE}/${encodeURIComponent(
+      customerId
+    )}/savings/deposit`;
+
+    const payload = {
+      AcctNum: formData.acctNum ? Number(formData.acctNum) : 0,
+      Amount: formData.amount ? Number(formData.amount) : 0,
+      TxnDate: new Date().toISOString(),
+      TxnDetail: formData.txnDetail || "Deposit",
+    };
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Deposit failed — Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    alert("Deposit successful!");
+    console.log("Deposit response:", data);
+
+    // Optionally update customer or transaction list in context
+    setSearchedCustomer((prev) =>
+      prev ? { ...prev, lastTransaction: data } : prev
+    );
+
+    return data;
+  } catch (error) {
+    console.error("Deposit error:", error);
+    alert(error.message);
+    return null;
+  }
+}, [searchedCustomer]);
+
+const makeWithdrawal = useCallback(async (formData) => {
+  try {
+    const token = getAuthToken();
+    if (!token) throw new Error("No auth token found — please login again.");
+
+    const storedId = localStorage.getItem("selectedCustId");
+    const ctxId =
+      searchedCustomer?.CustID ??
+      searchedCustomer?.custId ??
+      searchedCustomer?.id;
+    const customerId = String(storedId ?? ctxId ?? "").trim();
+    if (!customerId)
+      throw new Error("No customer selected. Please select a customer first.");
+
+    const url = `${API_BASE}/${encodeURIComponent(
+      customerId
+    )}/savings/withdraw`;
+
+    const payload = {
+      AcctNum: formData.acctNum ? Number(formData.acctNum) : 0,
+      Amount: formData.amount ? Number(formData.amount) : 0,
+      TxnDate: new Date().toISOString(),
+      TxnDetail: formData.txnDetail || "Withdrawal",
+    };
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Withdrawal failed — Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    alert("Withdrawal successful!");
+    console.log("Withdrawal response:", data);
+
+    setSearchedCustomer((prev) =>
+      prev ? { ...prev, lastTransaction: data } : prev
+    );
+
+    return data;
+  } catch (error) {
+    console.error("Withdrawal error:", error);
+    alert(error.message);
+    return null;
+  }
+}, [searchedCustomer]);
+
+
+
+
 
   const value = useMemo(
     () => ({
@@ -329,6 +445,8 @@ export const CustomerProvider = ({ children }) => {
       searchCustomer,
       advanceSearchCustomers,
       addAccount,
+      makeDeposit,
+      makeWithdrawal,
     }),
     [
       isDialogOpen,
@@ -341,6 +459,8 @@ export const CustomerProvider = ({ children }) => {
       searchCustomer,
       advanceSearchCustomers,
       addAccount,
+      makeDeposit,
+      makeWithdrawal,
     ]
   );
 
