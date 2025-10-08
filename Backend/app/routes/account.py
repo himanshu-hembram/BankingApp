@@ -11,6 +11,10 @@ from app.models import (
 )
 from app.schemas.customer import SavingAccountCreate, LoanAccountCreate
 from app.security.combined import authorize_user
+from app.schemas.customer import SavingAccountUpdateRequest
+from app.schemas.customer import SavingAccountUpdateResponse
+from decimal import Decimal
+from sqlalchemy.orm import Session, joinedload
 
 import random
 
@@ -154,3 +158,66 @@ async def create_loan_account(
         "AccSubType": at.AccSubType,
         "EMIID": emiID,
     }
+
+@router.put("/savings/update", response_model=SavingAccountUpdateResponse)
+async def update_saving_account(
+    request: SavingAccountUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    # 1. Fetch saving account
+    saving_acc = await db.get(SavingAccountDetail, request.AcctNum)
+    if not saving_acc:
+        raise HTTPException(status_code=404, detail="Saving account not found")
+
+    # 2. Prevent balance modification
+    updated_columns = []
+
+    if request.TransferLimit is not None:
+        saving_acc.TransferLimit = request.TransferLimit
+        updated_columns.append("TransferLimit")
+
+    if request.BranchCode is not None:
+        saving_acc.BranchCode = request.BranchCode
+        updated_columns.append("BranchCode")
+
+    # 3. Handle AccountType / SubType update
+    account_type_id = saving_acc.SavingAccTypeId  # default if unchanged
+
+    if request.AccountType and request.AccSubType:
+        # Check if type-subtype pair exists
+        query = select(AccountType).where(
+            AccountType.AccountType == request.AccountType,
+            AccountType.AccSubType == request.AccSubType,
+        )
+        result = await db.execute(query)
+        acc_type_obj = result.scalar_one_or_none()
+
+        if not acc_type_obj:
+            # Create new AccountType entry
+            new_acc_type = AccountType(
+                AccountType=request.AccountType, AccSubType=request.AccSubType
+            )
+            db.add(new_acc_type)
+            await db.flush()  # get new AccountTypeID
+            acc_type_obj = new_acc_type
+
+        account_type_id = acc_type_obj.AccountTypeID
+        saving_acc.SavingAccTypeId = account_type_id
+        updated_columns.append("SavingAccTypeId")
+
+        # Update the same in CustomerAccounts
+        cust_acc = await db.get(CustomerAccounts, request.AcctNum)
+        if cust_acc:
+            cust_acc.AccountTypeID = account_type_id
+            updated_columns.append("CustomerAccounts.AccountTypeID")
+
+    # 4. Commit updates
+    await db.commit()
+    await db.refresh(saving_acc)
+
+    return SavingAccountUpdateResponse(
+        message="Saving account updated successfully",
+        updated_columns=updated_columns,
+        account_type_id=account_type_id,
+        saving_detail=saving_acc,
+    )
