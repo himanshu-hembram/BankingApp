@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, UserPlus, FolderPlus, Menu } from 'lucide-react';
+import { LayoutDashboard, UserPlus, FolderPlus, Menu, CreditCard } from 'lucide-react';
 
 const navLinks = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/transactions', label: 'Transactions', icon: CreditCard },
   { path: '/customer', label: 'Add Customer', icon: UserPlus },
   { path: '/add-account', label: 'Add Account', icon: FolderPlus },
 ];
