@@ -6,6 +6,7 @@ import CustomerContext from '../context/CustomerContext';
 
 function Header({ onOpenAdvanceSearch }) {
   const { user, logout } = useAuth();
+  console.log('Header user:', user);
   const navigate = useNavigate();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const dropdownContainerRef = useRef(null); // Use a single ref for the container
