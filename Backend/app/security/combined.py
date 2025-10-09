@@ -28,9 +28,7 @@ async def authorize_user(
 
     token = creds.credentials
     logger.info("AUTH.TOKEN_EXTRACTED token_present")
-    auth_exception = None
 
-    # Attempt 1: Admin JWT path
     try:
         logger.info("AUTH.ADMIN.JWT_DECODE start_decode")
         sub = decode_admin_token(token)
@@ -42,21 +40,11 @@ async def authorize_user(
             logger.info("AUTH.ADMIN.DB_LOOKUP found sub=%s", sub)   
             logger.info("AUTH.SUCCESS admin_authenticated sub=%s", sub)
             return admin
-        else:
-            try:
-                logger.info("AUTH.SSO.VERIFY start_verify")
-                sso_user = await verify_sso_token(token)
-                logger.info("AUTH.SSO.VERIFY success user=%s", sso_user)
-                return sso_user
-            except HTTPException as e:
-                # Prefer the earlier exception if present
-                logger.exception("AUTH.SSO.ERROR unexpected_error")
-                if auth_exception is not None:
-                    raise auth_exception
-                raise e
-            # logger.warning("AUTH.ADMIN.DB_LOOKUP not_found sub=%s", sub)
-            # raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Admin not found")
-
+        logger.info("AUTH.SSO.VERIFY start_verify")
+        sso_user = await verify_sso_token(token)
+        logger.info("AUTH.SSO.VERIFY success user=%s", sso_user)
+        return sso_user
+            
     except HTTPException as e:
         logger.warning("AUTH.ADMIN.JWT_DECODE failed error=%s", str(e))
         auth_exception = e  # Save for later
