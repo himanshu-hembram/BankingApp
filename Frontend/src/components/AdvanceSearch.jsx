@@ -1,6 +1,7 @@
 // src/components/CustomerAdvanceSearch.jsx
 import React, { useState, useContext, useEffect, useRef, useCallback } from "react";
 import CustomerContext from "../context/CustomerContext";
+import {CircleX} from 'lucide-react';
 
 export default function AdvanceSearch({ isOpen, onClose, onAfterSelect }) {
   const { advanceSearchCustomers, searchCustomer } = useContext(CustomerContext);
@@ -115,8 +116,9 @@ export default function AdvanceSearch({ isOpen, onClose, onAfterSelect }) {
             aria-label="Close dialog"
             onClick={onClose}
             type="button"
+            
           >
-            ×
+            <CircleX size={18} />
           </button>
         </div>
 
