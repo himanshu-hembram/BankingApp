@@ -137,6 +137,7 @@ const AddAccount = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <Input label="Sub Type" required name="accSubType" type="text" disabled={isLocked} />
                 <Input label="Loan Amount" name="totalLoanAmount" type="number" disabled={isLocked} />
+                {/* <Input label="Balance Amount" name="balanceAmount" type="number" disabled={isLocked} /> */}
                 <Input label="Rate of Interest (%)" name="rateOfInterest" type="decimal" disabled={isLocked} />
                 <Input label="Loan Duration (months)" name="loanDuration" disabled={isLocked} />
                 <Input label="Branch Code" name="branchCode" required disabled={isLocked} />

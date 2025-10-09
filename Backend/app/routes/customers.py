@@ -133,6 +133,7 @@ async def get_customer(
                 AccountOut(
                     AcctNum=acc.AcctNum,
                     AccountType=acc.account_type.AccountType,
+                    AccSubType=acc.account_type.AccSubType,
                     Balance=float(acc.saving_detail.Balance or 0),
                     transactions=transactions,
                     emis=[],
@@ -156,6 +157,7 @@ async def get_customer(
                 AccountOut(
                     AcctNum=acc.AcctNum,
                     AccountType=acc.account_type.AccountType,
+                    AccSubType=acc.account_type.AccSubType,
                     Balance=float(acc.loan_detail.BalanceAmount or 0),
                     transactions=[],
                     emis=emis,

@@ -135,7 +135,7 @@ async def create_loan_account(
     ld = LoanAccountDetail(
         AcctNum=ca.AcctNum,
         EMIID=emiID,
-        BalanceAmount=payload.BalanceAmount,
+        BalanceAmount=payload.TotalLoanAmount,
         BranchCode=payload.BranchCode,
         RateOfInterest=payload.RateOfInterest,
         LoanDuration=payload.LoanDuration,
