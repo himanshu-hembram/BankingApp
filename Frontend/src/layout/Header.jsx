@@ -49,6 +49,12 @@ function Header({ onOpenAdvanceSearch }) {
             onChange={(e) => setSearchId(e.target.value)}
             className="w-full py-2 pl-10 pr-20 text-white bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-slate-600 transition"
             placeholder="Search..."
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSearch();
+              }
+            }}
           />
           {/* Search button */}
           <button

@@ -86,7 +86,7 @@ export const CustomerProvider = ({ children }) => {
       console.log("Customer found:", data);
 
       // ✅ Save customer ID separately
-     // localStorage.setItem("selectedCustId", data.CustID);
+      localStorage.setItem("selectedCustId", data.CustID);
     } catch (error) {
       console.error("Failed to fetch customer:", error);
       setSearchedCustomer(null);
@@ -117,6 +117,7 @@ export const CustomerProvider = ({ children }) => {
       }
 
       const data = await response.json();
+       // clear any selected customer
       console.log("Advance search results:", data);
       return data; // return array of customers
     } catch (error) {
@@ -253,7 +254,7 @@ export const CustomerProvider = ({ children }) => {
         searchedCustomer?.CustID ??
         searchedCustomer?.custId ??
         searchedCustomer?.id;
-      const customerId = String(storedId ?? ctxId ?? "").trim();
+      const customerId = String(ctxId ?? storedId ?? "").trim();
 
       if (!customerId)
         throw new Error("No customer selected. Please pick a customer first.");
@@ -327,7 +328,7 @@ export const CustomerProvider = ({ children }) => {
       searchedCustomer?.CustID ??
       searchedCustomer?.custId ??
       searchedCustomer?.id;
-    const customerId = String(storedId ?? ctxId ?? "").trim();
+    const customerId = String(ctxId ?? storedId ?? "").trim();
     if (!customerId)
       throw new Error("No customer selected. Please select a customer first.");
 
@@ -360,6 +361,8 @@ export const CustomerProvider = ({ children }) => {
     const data = await response.json();
     alert("Deposit successful!");
     console.log("Deposit response:", data);
+    searchCustomer(customerId); // Refresh customer data to reflect new balance
+    navigate("/dashboard"); // Redirect to dashboard after deposit
 
     // Optionally update customer or transaction list in context
     setSearchedCustomer((prev) =>
@@ -416,6 +419,9 @@ const makeWithdrawal = useCallback(async (formData) => {
     const data = await response.json();
     alert("Withdrawal successful!");
     console.log("Withdrawal response:", data);
+    searchCustomer(customerId); // Refresh customer data to reflect new balance
+    navigate("/dashboard"); // Redirect to dashboard after deposit
+
 
     setSearchedCustomer((prev) =>
       prev ? { ...prev, lastTransaction: data } : prev
