@@ -137,7 +137,8 @@ const AddAccount = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <Input label="Sub Type" required name="accSubType" type="text" disabled={isLocked} />
                 <Input label="Loan Amount" name="totalLoanAmount" type="number" disabled={isLocked} />
-                <Input label="Rate of Interest (%)" name="rateOfInterest" type="number" disabled={isLocked} />
+                {/* <Input label="Balance Amount" name="balanceAmount" type="number" disabled={isLocked} /> */}
+                <Input label="Rate of Interest (%)" name="rateOfInterest" type="decimal" disabled={isLocked} />
                 <Input label="Loan Duration (months)" name="loanDuration" disabled={isLocked} />
                 <Input label="Branch Code" name="branchCode" required disabled={isLocked} />
               </div>
@@ -145,6 +146,12 @@ const AddAccount = () => {
 
             {/* Actions */}
             <div className="flex justify-end gap-4 pt-8 border-t border-gray-200">
+              {/* Success banner */}
+              {successMessage && (
+                <div className="mb-6 rounded-lg bg-green-50 border border-green-200 text-green-800 px-4 py-3 shadow-sm">
+                  {successMessage}
+                </div>
+              )}
               <button
                 type="button"
                 onClick={handleCancel}

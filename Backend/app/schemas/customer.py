@@ -116,6 +116,7 @@ class LoanEMIOut(BaseModel):
 class AccountOut(BaseModel):
     AcctNum: int
     AccountType: str
+    AccSubType: Optional[str] = None
     Balance: float | None = None
     transactions: list[SavingTxnOut] = []   # for savings
     emis: list[LoanEMIOut] = []             # for loans

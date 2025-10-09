@@ -143,6 +143,7 @@ export default function Dashboard({ onOpenAdvanceSearch }) {
               <ul className="divide-y divide-slate-200">
                 {accounts.map((a, idx) => {
                   const type = a.type ?? a.AccountType ?? "Account";
+                  const AccSubType = a.AccSubType ?? a.AccSubType ?? "";
                   const accNo =
                     a.accountNo ?? a.AccountNumber ?? a.AcctNum ?? idx + 1;
                   const balance =
@@ -162,6 +163,7 @@ export default function Dashboard({ onOpenAdvanceSearch }) {
                     >
                       <div>
                         <p className="text-sm font-medium text-slate-800">{type}</p>
+                        <p className="text-sm font-normal text-slate-600">{AccSubType}</p>
                         <p className="text-xs text-slate-500">#{accNo}</p>
                       </div>
                       <p className="text-sm font-bold text-emerald-600">
