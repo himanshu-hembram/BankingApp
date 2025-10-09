@@ -19,7 +19,9 @@ export default function LoginForm({ onSuccess }) {
     const ssoUrl = "https://jktech-auth-gateway-140475459295.asia-south1.run.app";
     // const returnUrl = `${window.location.origin}/auth/callback`;
     const returnUrl = `http://localhost:5173/auth/callback`;
+    
     window.location.href = `${ssoUrl}/login?app_url=${encodeURIComponent(returnUrl)}`;
+    
   };
 
   const handleSubmit = async (e) => {
@@ -30,9 +32,11 @@ export default function LoginForm({ onSuccess }) {
     try {
       const res = await axios.post(`${API_BASE}/admin/login`, { identifier, password });
       const token = res.data?.access_token;
+      
 
       if (token) {
         const userInfo = {
+          userName: res.data.userName,
           userEmailid: res.data.userEmailid,
         };
         // Update AuthContext (this will call setAuthToken and persist user info)
