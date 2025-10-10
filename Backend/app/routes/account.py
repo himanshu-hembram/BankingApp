@@ -7,14 +7,15 @@ from app.security.deps import get_current_admin
 from app.db import get_db  # returns AsyncSession
 from app.models import (
     CustomerDetail, AccountType, CustomerAccounts,
-    SavingAccountDetail, LoanAccountDetail
+    SavingAccountDetail, LoanAccountDetail, SavingAccountTxnHistory
 )
 from app.schemas.customer import SavingAccountCreate, LoanAccountCreate
 from app.security.combined import authorize_user
 from app.schemas.customer import SavingAccountUpdateRequest
 from app.schemas.customer import SavingAccountUpdateResponse
 from decimal import Decimal
-from sqlalchemy.orm import Session, joinedload
+from datetime import date
+from sqlalchemy.exc import IntegrityError
 
 import random
 
@@ -86,6 +87,7 @@ async def create_savings_account(
 ):
     if not await customer_exists(db, cust_id):
         raise HTTPException(status_code=404, detail="Customer not found")
+
     at = await get_or_create_account_type(db, payload.AccountType, payload.AccSubType)
 
     if await has_duplicate_account(db, cust_id, at.AccountTypeID):
@@ -102,11 +104,38 @@ async def create_savings_account(
     )
     db.add(sd)
 
+    # compute numeric balance
     try:
+        balance_val = Decimal(payload.Balance) if payload.Balance is not None else Decimal("0.00")
+    except Exception:
+        balance_val = Decimal("0.00")
+
+    # create initial deposit txn if > 0
+    txn = None
+    if balance_val > Decimal("0.00"):
+        txn = SavingAccountTxnHistory(
+            TxnDate = date.today(),
+            AcctNum = ca.AcctNum,
+            TxnDetail = "Initial deposit",
+            WithdrawAmount = Decimal("0.00"),
+            DepositAmount = balance_val,
+            Balance = balance_val,
+        )
+        db.add(txn)
+
+    # flush and commit, handle errors
+    try:
+        await db.flush()
         await db.commit()
-    except IntegrityError:
+        await db.refresh(sd)
+        if txn is not None:
+            await db.refresh(txn)
+    except IntegrityError as ie:
         await db.rollback()
-        raise HTTPException(status_code=409, detail="Account conflict detected")
+        raise HTTPException(status_code=409, detail="Account creation conflict")
+    except Exception as exc:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail="Failed to create saving account")
 
     return {
         "AcctNum": ca.AcctNum,
