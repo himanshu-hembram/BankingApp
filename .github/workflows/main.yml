@@ -47,4 +47,6 @@ jobs:
           # The source flag tells it where to find the Dockerfile and code.
           source: ./Backend/
           # Configuration flags for the Cloud Run service:
-          flags: --allow-unauthenticated --port 8000
+          flags: > # Use a multiline string for readability
+            --allow-unauthenticated
+            --set-env-vars=PORT=8000
