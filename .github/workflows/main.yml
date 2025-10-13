@@ -1,4 +1,4 @@
-name: Deploy FastAPI Backend to Cloud Run (Simplified)
+name: Deploy FastAPI Backend to Cloud Run
 
 on:
   workflow_dispatch:
@@ -6,8 +6,7 @@ on:
 env:
   SERVICE_NAME: bankingapp-backend
   REGION: asia-south1
-  # Note: The deploy action automatically uses Container Registry (gcr.io)
-  # or Artifact Registry based on configuration, often simplifying the image name.
+  IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/bankingapp-backend:latest
 
 jobs:
   deploy:
@@ -15,38 +14,32 @@ jobs:
 
     permissions:
       contents: 'read'
-      id-token: 'write' # Required for gcloud auth
+      id-token: 'write'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
-      # --- Authentication Setup (Still Required) ---
-      # This step sets up the environment to talk to GCP
-      # - name: Set up Google Cloud CLI and Authenticate
-      #   uses: google-github-actions/setup-gcloud@v2
-      #   with:
-      #     service_account_key: ${{ secrets.GCP_SA_KEY }}
-      #     project_id: ${{ secrets.GCP_PROJECT_ID }}
-          # export_default_credentials is often optional when using dedicated actions
 
-      # --- Simplified Build, Push, and Deploy ---
-      # This action handles:
-      # 1. Building the Docker image locally.
-      # 2. Pushing the image to gcr.io or Artifact Registry (requires a Dockerfile).
-      # 3. Deploying the image to Cloud Run.
-      - name: Build, Push, and Deploy to Cloud Run
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build & Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Backend
+          push: true
+          tags: ${{ env.IMAGE }}
+
+      - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.REGION }}
-          # The source flag tells it where to find the Dockerfile and code.
-          source: ./Backend/
-          # Configuration flags for the Cloud Run service:
-          flags: > # Use a multiline string for readability
-            --allow-unauthenticated
-            --set-env-vars=PORT=8000
+          image: ${{ env.IMAGE }}
+          allow-unauthenticated: true
+          port: 8000
