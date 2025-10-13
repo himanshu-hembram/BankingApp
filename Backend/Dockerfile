@@ -33,7 +33,7 @@ FROM python:3.11-slim AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/opt/venv/bin:$PATH" \
-    PORT=8000  # Use port 8000 permanently
+    PORT=8000
 
 # Install minimal runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
