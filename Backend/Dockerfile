@@ -31,7 +31,7 @@ FROM python:3.11-slim as runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/opt/venv/bin:$PATH" \
-    PORT=8080
+    PORT=8000
 
 # Install only runtime deps (ca-certificates) and create non-root user
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -53,7 +53,7 @@ RUN chown -R appuser:appuser /app /opt/venv
 USER appuser
 
 # Expose default port expected by GCP Cloud Run
-EXPOSE 8080
+EXPOSE 8000
 
 # Use environment PORT if provided by platform (Cloud Run sets it)
 CMD ["sh", "-lc", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --workers 1"]
