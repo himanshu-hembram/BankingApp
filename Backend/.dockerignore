@@ -1,0 +1,52 @@
+# Ignore common files not needed in the image
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+build/
+dist/
+node_modules
+.venv
+.pytest_cache
+.cache
+*.egg-info
+.mypy_cache
+.DS_Store
+*.log
+.env
+.env.*
+/.git
+/.github
+/.vscode
+frontend/
+Frontend/
+*/.venv
+# Exclude local and VCS files
+.git
+.venv
+venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.mypy_cache
+.pytest_cache
+env/
+ENV/
+
+# Ignore local env files and secrets
+.env
+*.env
+
+# Node and frontend artifacts (if added at repo root)
+node_modules
+dist
+build
+
+# Dockerfile-related
+Dockerfile
+docker-compose*.yml
