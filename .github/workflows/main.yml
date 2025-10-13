@@ -37,29 +37,6 @@ jobs:
           # 2. Use the assigned variable and pipe it directly to docker login.
           #    The -u _json_key and --password-stdin are critical.
           echo "${GCP_KEY}" | docker login -u _json_key --password-stdin https://gcr.io
-      
-          # If you are using Artifact Registry for the final image location, 
-          # you might need to authenticate to that endpoint too:
-          # echo "${GCP_KEY}" | docker login -u _json_key --password-stdin https://<REGION>-docker.pkg.dev
-
-      # - name: Authenticate Docker to GCP Artifact Registry/GCR
-      #   run: |
-      #     echo "${{ secrets.GCP_SA_KEY }}" | docker login -u _json_key --password-stdin https://gcr.io
-      #     # If you use Artifact Registry, also include that endpoint:
-      #     # echo "${{ secrets.GCP_SA_KEY }}" | docker login -u _json_key --password-stdin https://<REGION>-docker.pkg.dev
-      # - name: Authenticate Docker to GCR
-      #   run: |
-      #     printf '%s' "${{ secrets.GCP_SA_KEY }}" > "${HOME}/gcloud-key.json"
-      #     gcloud auth activate-service-account --key-file="${HOME}/gcloud-key.json"
-      #     gcloud auth configure-docker --quiet
-
-
-      # - name: Authenticate Docker to GCR
-      #   run: |
-      #     echo "${{ secrets.GCP_SA_KEY }}" > "${HOME}/gcloud-key.json"
-      #     gcloud auth activate-service-account --key-file="${HOME}/gcloud-key.json"
-      #     gcloud auth configure-docker --quiet
-
 
       - name: Build & Push Docker image
         uses: docker/build-push-action@v5
