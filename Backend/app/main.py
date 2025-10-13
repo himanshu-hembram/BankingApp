@@ -8,6 +8,7 @@ from app.routes.admin import router as admin_router
 from app.routes.customers import router as customers_router
 from app.routes.account import router as account_router
 from app.routes.savings_txn import router as savings_txn_router
+import asyncio
 # from app.routes.admin_sso import router as admin_sso_router
 
 app = FastAPI()
@@ -40,9 +41,15 @@ app.include_router(savings_txn_router)
 # Startup: create tables asynchronously
 @app.on_event("startup")
 async def on_startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    print("Database tables created")
+    async def init_db():
+        try:
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            print("Database tables created")
+        except Exception as e:
+            print("DB init failed:", e)
+
+    asyncio.create_task(init_db())
 
 
 # Health: DB connectivity
