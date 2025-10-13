@@ -89,8 +89,9 @@ RUN chown -R appuser:appuser /home/appuser
 USER appuser
 
 # Expose port and set workdir
-WORKDIR /home/appuser/app
+ENV PORT=8000
 EXPOSE 8000
+WORKDIR /home/appuser/app
 
 # Default command uses uvicorn. In production you might replace with gunicorn + uvicorn workers.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--loop", "uvloop", "--workers", "1"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --loop uvloop --workers 1"]
