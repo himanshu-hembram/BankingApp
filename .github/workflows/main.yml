@@ -1,0 +1,46 @@
+name: Deploy FastAPI Backend to Cloud Run (Simplified)
+
+on:
+  workflow_dispatch:
+
+env:
+  SERVICE_NAME: bankingApp-backend
+  REGION: asia-south1
+  # Note: The deploy action automatically uses Container Registry (gcr.io)
+  # or Artifact Registry based on configuration, often simplifying the image name.
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write' # Required for gcloud auth
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # --- Authentication Setup (Still Required) ---
+      # This step sets up the environment to talk to GCP
+      - name: Set up Google Cloud CLI and Authenticate
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          # export_default_credentials is often optional when using dedicated actions
+
+      # --- Simplified Build, Push, and Deploy ---
+      # This action handles:
+      # 1. Building the Docker image locally.
+      # 2. Pushing the image to gcr.io or Artifact Registry (requires a Dockerfile).
+      # 3. Deploying the image to Cloud Run.
+      - name: Build, Push, and Deploy to Cloud Run
+        uses: google-github-actions/deploy-appengine/cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          # The source flag tells it where to find the Dockerfile and code.
+          source: .
+          # Configuration flags for the Cloud Run service:
+          flags: --allow-unauthenticated --port 8000
