@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  SERVICE_NAME: bankingApp-backend
+  SERVICE_NAME: bankingapp-backend
   REGION: asia-south1
   # Note: The deploy action automatically uses Container Registry (gcr.io)
   # or Artifact Registry based on configuration, often simplifying the image name.
