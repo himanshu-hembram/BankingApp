@@ -55,4 +55,4 @@ USER appuser
 EXPOSE 8000
 
 # Start the app using Uvicorn on port 8000
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --loop uvloop --workers 1"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --workers 1"]
