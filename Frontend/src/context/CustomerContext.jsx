@@ -276,7 +276,8 @@ export const CustomerProvider = ({ children }) => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
-      });
+      }
+    );
 
       // Clear selected customer id from localStorage after successful account creation
 
@@ -286,6 +287,8 @@ export const CustomerProvider = ({ children }) => {
             "Unauthorized — token may be expired. Please log in again."
           );
         } else if (response.status === 404) {
+          localStorage.removeItem("selectedCustId");
+          setSearchedCustomer(null);
           throw new Error("Customer not found.");
         } else {
           throw new Error(
@@ -293,8 +296,7 @@ export const CustomerProvider = ({ children }) => {
           );
         }
       }
-      localStorage.removeItem("selectedCustId");
-      setSearchedCustomer(null);
+      
 
       const created = await response.json();
 
@@ -310,6 +312,8 @@ export const CustomerProvider = ({ children }) => {
             : [created],
         };
       });
+      searchCustomer(customerId); // Refresh customer data to reflect new balance
+      navigate("/dashboard"); // Redirect to dashboard after deposit
 
       return created; // caller can navigate on truthy result
     },
