@@ -52,5 +52,6 @@ jobs:
           image: ${{ env.IMAGE }}
           allow-unauthenticated: true
           port: 8000
+          timeout: 20s
           env-vars: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
