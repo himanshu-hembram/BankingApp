@@ -12,7 +12,7 @@ load_dotenv()
 # Use asyncpg driver
 DATABASE_URL = os.environ.get(
     "DATABASE_URL",
-    "postgresql+asyncpg://sourav_jkt:jkt123@localhost:5432/bank_db_f2",
+    "postgresql+asyncpg://postgres:Training%40123@104.154.187.244:5432/banking_db",
 )
 
 # Global SQLAlchemy objects
