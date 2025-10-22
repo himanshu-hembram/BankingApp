@@ -7,7 +7,6 @@ env:
   SERVICE_NAME: bankingapp-backend
   REGION: asia-south1
   IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/bankingapp-backend:latest
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -53,3 +52,5 @@ jobs:
           image: ${{ env.IMAGE }}
           allow-unauthenticated: true
           port: 8000
+          env-vars: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
