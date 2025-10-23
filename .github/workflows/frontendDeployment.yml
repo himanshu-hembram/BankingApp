@@ -1,48 +1,38 @@
-name: Build and publish Frontend image
-
+name: Deploy React Frontend to Cloud Run (Simplified)
+ 
 on:
   workflow_dispatch:
-
-permissions:
-  contents: read
-  packages: write
-  id-token: write
-
+ 
+env:
+  SERVICE_NAME: react-frontend
+  REGION: asia-south1
+  # The deploy action will automatically push to gcr.io / Artifact Registry.
+ 
 jobs:
-  build-and-push:
-    name: Build and push Docker image to GHCR
+  deploy:
     runs-on: ubuntu-latest
-
+ 
+    permissions:
+      contents: 'read'
+      id-token: 'write' # Required for gcloud auth
+ 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
+ 
+      # --- Authentication Setup ---
+      - name: Set up Google Cloud CLI and Authenticate
+        uses: google-github-actions/setup-gcloud@v2
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push image
-        uses: docker/build-push-action@v4
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+ 
+      # --- Build, Push, and Deploy Frontend ---
+      - name: Build, Push, and Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
         with:
-          context: ./Frontend
-          file: ./Frontend/Dockerfile
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/banking-frontend:latest
-            ghcr.io/${{ github.repository_owner }}/banking-frontend:${{ github.sha }}
-          build-args: |
-            VITE_API_BASE_URL=${{ secrets.FRONTEND_API_URL || 'https://bankingapp-backend-140475459295.us-central1.run.app' }}
-
-      - name: Publish result
-        run: |
-          echo "Published ghcr.io/${{ github.repository_owner }}/banking-frontend:${{ github.sha }}"
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          source: ./frontend/    # Path to your React frontend
+          port: 80               # React app served via nginx default port
+          flags: --allow-unauthenticated
