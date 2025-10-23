@@ -4,7 +4,7 @@ import { getAuthToken } from "../lib/api"; // use the centralized token helper
 
 const CustomerContext = createContext();
 
-const API_BASE = "http://localhost:8000/customers";
+const API_BASE = "https://bankingapp-backend-140475459295.us-central1.run.app/customers";
 
 export const CustomerProvider = ({ children }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
