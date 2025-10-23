@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Loader2, Save, X, CheckCircle } from 'lucide-react';
 import api from '../lib/api';
+import { useNavigate } from 'react-router-dom';
+import CustomerContext from '../context/CustomerContext';
 
 const POSTAL_CODE_API = 'https://api.zippopotam.us/in/';
 
@@ -16,6 +18,8 @@ function AddCustomerPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const { searchCustomer } = React.useContext(CustomerContext);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,9 +58,13 @@ function AddCustomerPage() {
     setSuccessMessage('');
 
     try {
-      await api.post('/customers', formData);
-      setSuccessMessage('Customer has been saved successfully!');
+      const res = await api.post('/customers', formData);
+      console.log('Customer created:', res.data);
+      const customerId = res.data.CustID;
+      // setSuccessMessage('Customer has been saved successfully!');
       setFormData(initialFormState);
+      searchCustomer(customerId); // Refresh customer data to reflect new balance
+      navigate("/dashboard"); // Redirect to dashboard after deposit
     } catch (err) {
       const errorMessage =
         err.response?.data?.detail ||
