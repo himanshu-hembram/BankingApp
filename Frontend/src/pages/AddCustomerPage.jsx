@@ -58,7 +58,7 @@ function AddCustomerPage() {
     setSuccessMessage('');
 
     try {
-      const res = await api.post('/customers', formData);
+      const res = await api.post('/customers/', formData);
       console.log('Customer created:', res.data);
       const customerId = res.data.CustID;
       // setSuccessMessage('Customer has been saved successfully!');
