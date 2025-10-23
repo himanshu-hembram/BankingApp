@@ -1,8 +1,8 @@
 import React, { useState} from "react";
 
-import axios from "axios";
+import api from "../lib/api.js";
 import { useAuth } from "../context/useAuth.js";
-const API_BASE = "http://localhost:8000";
+// const API_BASE = "http://localhost:8000";
 
 
 
@@ -30,7 +30,7 @@ export default function LoginForm({ onSuccess }) {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${API_BASE}/admin/login`, { identifier, password });
+      const res = await api.post(`/admin/login`, { identifier, password });
       const token = res.data?.access_token;
       
 
