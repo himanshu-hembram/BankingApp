@@ -18,7 +18,7 @@ export default function LoginForm({ onSuccess }) {
     // Production SSO service URL
     const ssoUrl = "https://jktech-auth-gateway-140475459295.asia-south1.run.app";
     // const returnUrl = `${window.location.origin}/auth/callback`;
-    const returnUrl = `http://localhost:5173/auth/callback`;
+    const returnUrl = `https://bankingapp-frontend-140475459295.us-central1.run.app/auth/callback`;
     
     window.location.href = `${ssoUrl}/login?app_url=${encodeURIComponent(returnUrl)}`;
     
