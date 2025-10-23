@@ -1,12 +1,13 @@
-name: Deploy React Frontend to Cloud Run (Simplified)
+name: Deploy React Frontend to Cloud Run
  
 on:
   workflow_dispatch:
  
 env:
-  SERVICE_NAME: react-frontend
-  REGION: asia-south1
-  # The deploy action will automatically push to gcr.io / Artifact Registry.
+  SERVICE_NAME: bankingapp-frontend
+  REGION: us-central1
+  IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/bankingapp-frontend:latest
+  TIMEOUT: 30s
  
 jobs:
   deploy:
@@ -14,25 +15,39 @@ jobs:
  
     permissions:
       contents: 'read'
-      id-token: 'write' # Required for gcloud auth
+      id-token: 'write'
  
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
  
-      # --- Authentication Setup ---
-      - name: Set up Google Cloud CLI and Authenticate
-        uses: google-github-actions/setup-gcloud@v2
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
  
-      # --- Build, Push, and Deploy Frontend ---
-      - name: Build, Push, and Deploy to Cloud Run
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+ 
+      - name: Authenticate Docker to GCR
+        env:
+          GCP_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          echo "${GCP_KEY}" | docker login -u _json_key --password-stdin https://gcr.io
+ 
+      - name: Build & Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Frontend
+          push: true
+          tags: ${{ env.IMAGE }}
+ 
+      - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.REGION }}
-          source: ./frontend/    # Path to your React frontend
-          port: 80               # React app served via nginx default port
-          flags: --allow-unauthenticated
+          image: ${{ env.IMAGE }}
+          allow-unauthenticated: true
+          port: 8080
+          timeout: ${{ env.TIMEOUT }}
